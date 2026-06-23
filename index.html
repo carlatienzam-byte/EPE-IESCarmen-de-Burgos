@@ -4,207 +4,286 @@
   <meta charset="utf-8">
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component@5.x.x/dist/aframe-event-set-component.min.js"></script>
-	 <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
 </head>
+
 <body>
-<a-scene>
-
-	   <!-- Sonido -->
-      <a-sound src="warm-nights.mp3" autoplay="true"
-               position="-38.38629 7.52826 6.26842"
-               sound="loop: true; volume: 20"></a-sound>
-  
-
-  <a-gltf-model src="backrooms_vr.glb" scale="1.25 1.25 1.25" position="0 0 0"></a-gltf-model>
-
-  <a-plane width="50" height="50" material="color: #ba9652"
-           rotation="-90 0 0" geometry="height: 1000; width: 1000"
-           position="0 -4.344 0"></a-plane>
-
-  <a-sky color="#b28f50"></a-sky>
-
-
-<a-link id="miEnlace1" 
-		class="clickable" src="Sala Gasolinera.png" 
-		href="https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/" 
-		title="Sala Gasolinera" position="6.4927 0.948 6.76992" 
-		scale="0.5 0.5 0.5" 
-		geometry="primitive: circle; segments: 64" 
-		material="shader: portal; side: double; previewDistance: 7.5" 
-		rotation="0 90 0">
-	<a-entity 									
-			  text="align: center; color: white; font: kelsonsans; value: Sala Gasolinera; width: 5" 
-			  position="0 1.5 0" 
-			  rotation="0 180 0">
-	</a-entity>
-	
-	<a-entity 
-			  geometry="primitive: sphere; phiLength: 180; thetaLength: 360; segmentsHeight: 64; segmentsWidth: 64" 
-			  material="shader: portal; side: back; borderEnabled: 0; previewDistance: 7.5" rotation="0 180 0" 
-			  visible="false">
-	</a-entity>
-	<a-entity 
-			  geometry="primitive: sphere; radius: 10; segmentsHeight: 64; segmentsWidth: 64" 
-			  material="shader: portal; side: back; borderEnabled: 0; previewDistance: 7.5" 
-			  visible="false">
-	</a-entity>
-	</a-link>
-	
-	<a-entity class="clickable portal"
-          id="portal1"
-          position="6.4927 0.948 6.76992" 
-          scale="1 1 1"
-          geometry="primitive: ring; radiusInner: 0.8; radiusOuter: 1.2"
-          material="shader: standard; color: purple; emissive: #7c3cff; emissiveIntensity: 2"
-		  rotation="0 90 0">
-</a-entity>
-	
-  <a-link id="miEnlace2"
-		  class="clickable"
-		  src="Japanese Period.png" 
-		  href="https://carlatienzam-byte.github.io/EPE-Carmen-Lara-Gomez/" 
-		  title="Sala Japanese Period" position="-42.05693 1.3171 -4.44459" 
-		  scale="0.5 0.5 0.5">
-	</a-link>
-	
-  <a-link id="miEnlace3"
-		  class="clickable"
-		  src="Strange World.png" 
-		  href="https://carlatienzam-byte.github.io/EPE-Alejandra-Henche-de-Lucas/" 
-		  title="Strange World" 
-		  position="-54.32779 1.14831 8.06231" 
-		  scale="0.5 0.5 0.5">
-	</a-link>
-	
-  <a-link id="miEnlace4" 
-		  class="clickable"
-		  src="The Simpsons.jpg"  
-		  href="https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/" 
-		  title="The Simpsons" 
-		  position="-53.73499 1.76586 -4.54693" 
-		  scale="0.5 0.5 0.5"></a-link>
-	
-  <a-link id="miEnlace5"
-		  class="clickable"
-		  src="AdventureTime.jpg"  
-		  href="https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/" 
-		  title="Adventure Time" 
-		  position="-79.05526 1.66112 18.02414" 
-		  scale="0.5 0.5 0.5"></a-link>
-
-  <!-- Inicio entidad completa para camara y movimiento -->
-             <a-entity
-        id="playerRig"
-        position="0 0 0"
-        movement-controls="speed: 0.3; fly: false;"
-        universal-controls="movementEnabled: true;"
-      >
-         <!-- Controlador mano derecha -->
-  			 
-<a-entity
-    id="rightHand"
-    laser-controls="hand: right"
-    raycaster="objects: .clickable"
-    cursor="rayOrigin: entity; fuse: false"
-    oculus-touch-controls="hand: right">
-</a-entity>
-
-      <!-- Controlador mano izquierda (opcional) -->
-   <a-entity
-    id="leftHand"
-    laser-controls="hand: left"
-    raycaster="objects: .clickable"
-    cursor="rayOrigin: entity; fuse: false"
-    oculus-touch-controls="hand: left">
-</a-entity>
-         
-      <a-entity camera look-controls position="0 1.6 0"></a-entity>
-         </a-entity>
-<!-- Fin entidad completa -->
-       
-</a-scene>
 
 <script>
-let currentTransition = false;
 
-// 🔥 Fade overlay
-const fade = document.createElement('a-plane');
-fade.setAttribute('position', '0 0 -0.5');
-fade.setAttribute('width', '5');
-fade.setAttribute('height', '5');
-fade.setAttribute('material', 'color: black; opacity: 0');
-fade.setAttribute('class', 'fade');
-document.querySelector('a-scene').appendChild(fade);
+/* =========================
+   🌌 POSICIONES DE APARICIÓN
+========================= */
 
-function fadeOutIn(callback) {
-  if (currentTransition) return;
-  currentTransition = true;
+const spawnPoints = {
 
-  fade.setAttribute('animation', {
-    property: 'material.opacity',
-    to: 1,
-    dur: 300
+  "#world_1": {
+    x: 0,
+    y: 0,
+    z: 0,
+    rotY: 0
+  },
+
+  "#world_2": {
+    x: 0,
+    y: 0,
+    z: 0,
+    rotY: 180
+  }
+
+};
+
+/* =========================
+   🌌 CAMBIO DE MUNDO
+========================= */
+
+function goWorld(id) {
+
+  document.querySelectorAll('[data-world]').forEach(world => {
+    world.setAttribute('visible', false);
   });
 
-  setTimeout(() => {
-    callback();
+  const target = document.querySelector(id);
 
-    fade.setAttribute('animation', {
-      property: 'material.opacity',
-      to: 0,
-      dur: 500
-    });
+  if (target) {
+    target.setAttribute('visible', true);
+  }
+
+  const rig = document.querySelector('#playerRig');
+
+  if (rig && spawnPoints[id]) {
+
+    const p = spawnPoints[id];
+
+    rig.object3D.position.set(
+      p.x,
+      p.y,
+      p.z
+    );
+
+    rig.setAttribute(
+      'rotation',
+      `0 ${p.rotY} 0`
+    );
+  }
+}
+
+/* =========================
+   🔮 PORTAL AAA
+========================= */
+
+AFRAME.registerComponent('portal-aaa', {
+
+  schema: {
+    target: {type: 'string'},
+    radius: {type: 'number', default: 2.2},
+    cooldown: {type: 'number', default: 1500}
+  },
+
+  init: function () {
+
+    this.player = document.querySelector('#playerRig');
+    this.lastTeleport = 0;
+
+  },
+
+  tick: function () {
+
+    if (!this.player) return;
+
+    const playerPos = new THREE.Vector3();
+    const portalPos = new THREE.Vector3();
+
+    this.player.object3D.getWorldPosition(playerPos);
+    this.el.object3D.getWorldPosition(portalPos);
+
+    const distance = playerPos.distanceTo(portalPos);
+
+    if (
+      distance < this.data.radius &&
+      Date.now() - this.lastTeleport > this.data.cooldown
+    ) {
+
+      this.lastTeleport = Date.now();
+      this.teleport();
+
+    }
+  },
+
+  teleport: function () {
+
+    const target = this.data.target;
+
+    let fade = document.querySelector('#fade');
+
+    if (!fade) {
+
+      fade = document.createElement('a-plane');
+
+      fade.setAttribute('id', 'fade');
+      fade.setAttribute('position', '0 0 -0.5');
+      fade.setAttribute('width', '5');
+      fade.setAttribute('height', '5');
+      fade.setAttribute(
+        'material',
+        'color:black; opacity:0'
+      );
+
+      const camera = document.querySelector('[camera]');
+
+      if (camera) {
+        camera.appendChild(fade);
+      }
+
+    }
+
+    fade.setAttribute(
+      'animation__fadein',
+      'property: material.opacity; to:1; dur:250'
+    );
 
     setTimeout(() => {
-      currentTransition = false;
-    }, 500);
 
-  }, 300);
-}
+      goWorld(target);
 
-// 🔥 SOLO efecto hover (sin salir de VR)
-function setupVRLink(id, url) {
-  const el = document.querySelector(id);
+      fade.setAttribute(
+        'animation__fadeout',
+        'property: material.opacity; to:0; dur:500'
+      );
 
-  el.addEventListener('mouseenter', () => {
-    el.setAttribute('scale', '0.7 0.7 0.7');
-  });
-
-  el.addEventListener('mouseleave', () => {
-    el.setAttribute('scale', '0.5 0.5 0.5');
-  });
-
-  el.addEventListener('click', () => {
-
-    fadeOutIn(() => {
-      // ✔ OPCIÓN SEGURA VR:
-      // abre en nueva pestaña SIN romper VR
-      window.open(url, '_blank');
-    });
-
-  });
-}
-
-// links
-setupVRLink('#miEnlace1','https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/');
-setupVRLink('#miEnlace2','https://carlatienzam-byte.github.io/EPE-Carmen-Lara-Gomez/');
-setupVRLink('#miEnlace3','https://carlatienzam-byte.github.io/EPE-Alejandra-Henche-de-Lucas/');
-setupVRLink('#miEnlace4','https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/');
-setupVRLink('#miEnlace5','https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/');
-
-// audio fix VR
-document.addEventListener('DOMContentLoaded', () => {
-  const resumeAudio = () => {
-    document.querySelectorAll('[sound]').forEach(e => {
-      const s = e.components.sound;
-      if (s) s.playSound();
-    });
-  };
-
-  window.addEventListener('click', resumeAudio);
-  window.addEventListener('triggerdown', resumeAudio);
+    }, 250);
+  }
 });
+
+/* =========================
+   🌀 PORTAL ENERGY
+========================= */
+
+AFRAME.registerComponent('portal-energy', {
+
+  tick: function () {
+
+    const time = Date.now() * 0.002;
+
+    const scale =
+      1 + Math.sin(time) * 0.08;
+
+    const rotation =
+      Date.now() * 0.03;
+
+    this.el.setAttribute(
+      'scale',
+      `${scale} ${scale} ${scale}`
+    );
+
+    this.el.setAttribute(
+      'rotation',
+      `0 ${rotation} 0`
+    );
+  }
+
+});
+
+/* =========================
+   🚀 INICIO
+========================= */
+
+window.addEventListener('load', () => {
+  goWorld('#world_1');
+});
+
 </script>
+
+<a-scene>
+
+  <!-- 🎮 PLAYER -->
+  <a-entity id="playerRig"
+            movement-controls="speed: 0.3; fly: false">
+
+    <a-entity camera look-controls position="0 1.6 0"></a-entity>
+
+    <a-entity laser-controls="hand: right"
+              raycaster="objects: .clickable"></a-entity>
+
+    <a-entity laser-controls="hand: left"
+              raycaster="objects: .clickable"></a-entity>
+
+  </a-entity>
+
+  <!-- 🌍 WORLD 1 (MAIN) -->
+  <a-entity id="world_1" data-world="true">
+
+    <a-sound src="warm-nights.mp3"
+             autoplay="true"
+             sound="loop: true; volume: 10"></a-sound>
+
+    <a-gltf-model src="backrooms_vr.glb"
+                  scale="1.25 1.25 1.25"></a-gltf-model>
+
+    <a-plane rotation="-90 0 0"
+             width="50" height="50"
+             position="0 -4.344 0"
+             material="color: #ba9652"></a-plane>
+
+    <a-sky color="#b28f50"></a-sky>
+
+    <!-- 🔮 PORTAL → WORLD 2 -->
+    <a-entity id="portal_world2"
+              class="clickable"
+              geometry="primitive: torus; radius: 1"
+              material="color: #7c3cff; emissive: #aa55ff; emissiveIntensity: 2"
+              position="6.20096 1.76034 6.61931"
+			  scale="0.75 0.75 0.75"
+			  rotation="0 90 0"
+              portal-aaa="target: #world_2; radius: 2.2"
+              portal-energy>
+    </a-entity>
+	 
+   
+  
+  </a-entity>
+
+  <!-- 🌍 WORLD 2 -->
+  <a-entity id="world_2" data-world="true" visible="false">
+
+    <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
+                  position="-5 0 2"
+                  rotation="0 -90 0"></a-gltf-model>
+
+    <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
+
+    <a-gltf-model src="truck_opt.glb"
+                  position="-29 2.3 20"
+                  rotation="0 -20 0"></a-gltf-model>
+
+    <a-gltf-model src="Sol_opt.glb"
+                  position="-120 200 160"></a-gltf-model>
+
+    <a-gltf-model src="cielo_opt.glb"
+                  scale="300 300 300"></a-gltf-model>
+
+    <a-cylinder color="red"
+                position="0 1 4.34"
+                scale="0.2 0.2 0.2"></a-cylinder>
+
+    <!-- 🔮 PORTAL DE VUELTA -->
+    <a-entity id="portal_back_to_main"
+              class="clickable"
+              geometry="primitive: torus; radius: 1"
+              material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 2"
+              position="9.92611 1.96798 -3.91934"
+			  scale="0.75 0.75 0.75" 
+			  rotation="0 90 0"
+              portal-aaa="target: #world_1; radius: 2.2"
+              portal-energy>
+    </a-entity>
+
+	 
+	  
+  </a-entity>
+
+</a-scene>
+
 </body>
 </html>
