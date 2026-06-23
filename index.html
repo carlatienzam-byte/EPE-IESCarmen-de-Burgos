@@ -175,20 +175,18 @@ AFRAME.registerComponent('raycaster-sound', {
   <!-- 🎮 PLAYER -->
 
 
-<a-entity id="playerRig" 
-	movement-controls="speed: 0.3; fly: false"> 
-	<a-entity camera look-controls position="0 1.6 0">
-		
-	</a-entity> 
-	<a-entity laser-controls="hand: right" 
-		raycaster="objects: .clickable">
-	</a-entity> 
-	
-	<a-entity laser-controls="hand: left" 
-		raycaster="objects: .clickable">
-	</a-entity> 
+  <a-entity id="playerRig"
+            movement-controls="speed: 0.3; fly: false">
 
-</a-entity>
+    <a-entity camera look-controls position="0 1.6 0"></a-entity>
+
+    <a-entity laser-controls="hand: right"
+              raycaster="objects: .clickable"></a-entity>
+
+    <a-entity laser-controls="hand: left"
+              raycaster="objects: .clickable"></a-entity>
+
+  </a-entity>
 
 		  
 	
@@ -227,15 +225,15 @@ AFRAME.registerComponent('raycaster-sound', {
 
   <!-- 🌍 WORLD 2 -->
   <a-entity id="world_2" data-world="true" visible="false">
- 
-	<a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
+ <a-entity
+	gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
     position="-5 0 2"
-	 class="clickable"
+	class="clickable"
     rotation="0 -90 0"
     id="rotativo"
     sound="src: rotativo.mp3; autoplay: false; loop: false"
     raycaster-sound>
-	</a-gltf-model>
+	</a-entity>
 
 	
 	  
