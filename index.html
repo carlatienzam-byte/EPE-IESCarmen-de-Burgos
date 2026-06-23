@@ -175,32 +175,20 @@ AFRAME.registerComponent('raycaster-sound', {
   <!-- 🎮 PLAYER -->
 
 
-<a-entity id="playerRig"
-        position="0 0 0"
-        movement-controls="speed: 0.3; fly: false;"
-        universal-controls="movementEnabled: true;"
-      >
-         <!-- Controlador mano derecha -->
-      <a-entity
-        laser-controls="hand: right; model: true"
-        raycaster="objects: .clickable"
-        line="color: red; opacity: 0.8"
-         id="rightHand" 
-        oculus-touch-controls="hand: right; model: true"
-	    cursor="rayOrigin: entity; fuse:false">
-		</a-entity>
+<a-entity id="playerRig" 
+	movement-controls="speed: 0.3; fly: false"> 
+	<a-entity camera look-controls position="0 1.6 0">
+		
+	</a-entity> 
+	<a-entity laser-controls="hand: right" 
+		raycaster="objects: .clickable">
+	</a-entity> 
+	
+	<a-entity laser-controls="hand: left" 
+		raycaster="objects: .clickable">
+	</a-entity> 
 
-		   <a-entity
-        laser-controls="hand: left; model: true"
-        raycaster="objects: .clickable"
-        line="color: blue; opacity: 0.8"
-        id="leftHand" 
-        oculus-touch-controls="hand: left; model: true"
-		   cursor="rayOrigin: entity; fuse:false">
-      </a-entity>
-         
-      <a-entity camera look-controls position="0 1.6 0"></a-entity>
-         </a-entity>
+</a-entity>
 
 		  
 	
