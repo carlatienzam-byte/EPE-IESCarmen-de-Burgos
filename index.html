@@ -11,7 +11,7 @@
 <a-scene>
   
   <a-assets>
-    <audio id="bgmusic" src="warm-nights.mp3" preload="auto" autoplay loop></audio>
+    <audio id="bgmusic" src="warm-nights.mp3"></audio>
   </a-assets>
 	
 	 <a-entity sound="src: #bgmusic; autoplay: true; loop: true; volume: 20"
@@ -26,15 +26,40 @@
   <a-sky color="#b28f50"></a-sky>
 
 
-<a-link
-    id="miEnlace1"
-    class="clickable"
-    src="Sala Gasolinera.png"
-    href="https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/"
-    title="Sala Gasolinera"
-    position="6.4927 0.948 6.76992"
-    scale="0.5 0.5 0.5">
-</a-link>
+<a-link id="miEnlace1" 
+		class="clickable" src="Sala Gasolinera.png" 
+		href="https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/" 
+		title="Sala Gasolinera" position="6.4927 0.948 6.76992" 
+		scale="0.5 0.5 0.5" 
+		geometry="primitive: circle; segments: 64" 
+		material="shader: portal; side: double; previewDistance: 7.5" 
+		rotation="0 90 0">
+	<a-entity 									
+			  text="align: center; color: white; font: kelsonsans; value: Sala Gasolinera; width: 5" 
+			  position="0 1.5 0" 
+			  rotation="0 180 0">
+	</a-entity>
+	
+	<a-entity 
+			  geometry="primitive: sphere; phiLength: 180; thetaLength: 360; segmentsHeight: 64; segmentsWidth: 64" 
+			  material="shader: portal; side: back; borderEnabled: 0; previewDistance: 7.5" rotation="0 180 0" 
+			  visible="false">
+	</a-entity>
+	<a-entity 
+			  geometry="primitive: sphere; radius: 10; segmentsHeight: 64; segmentsWidth: 64" 
+			  material="shader: portal; side: back; borderEnabled: 0; previewDistance: 7.5" 
+			  visible="false">
+	</a-entity>
+	</a-link>
+	
+	<a-entity class="clickable portal"
+          id="portal1"
+          position="6.4927 0.948 6.76992" 
+          scale="1 1 1"
+          geometry="primitive: ring; radiusInner: 0.8; radiusOuter: 1.2"
+          material="shader: standard; color: purple; emissive: #7c3cff; emissiveIntensity: 2"
+		  rotation="0 90 0">
+</a-entity>
 	
   <a-link id="miEnlace2"
 		  class="clickable"
@@ -102,32 +127,74 @@
 </a-scene>
 
 <script>
-	
-	function setupVRLink(id, url) {
-    const el = document.querySelector(id);
+let currentTransition = false;
 
-    el.addEventListener('mouseenter', () => {
-        el.setAttribute('scale', '0.7 0.7 0.7');
+// 🔥 Fade overlay
+const fade = document.createElement('a-plane');
+fade.setAttribute('position', '0 0 -0.5');
+fade.setAttribute('width', '5');
+fade.setAttribute('height', '5');
+fade.setAttribute('material', 'color: black; opacity: 0');
+fade.setAttribute('class', 'fade');
+document.querySelector('a-scene').appendChild(fade);
+
+function fadeOutIn(callback) {
+  if (currentTransition) return;
+  currentTransition = true;
+
+  fade.setAttribute('animation', {
+    property: 'material.opacity',
+    to: 1,
+    dur: 300
+  });
+
+  setTimeout(() => {
+    callback();
+
+    fade.setAttribute('animation', {
+      property: 'material.opacity',
+      to: 0,
+      dur: 500
     });
 
-    el.addEventListener('mouseleave', () => {
-        el.setAttribute('scale', '0.5 0.5 0.5');
-    });
+    setTimeout(() => {
+      currentTransition = false;
+    }, 500);
 
-    el.addEventListener('click', () => {
-        window.location.href = url;
-    });
+  }, 300);
 }
-	
-	
 
+// 🔥 SOLO efecto hover (sin salir de VR)
+function setupVRLink(id, url) {
+  const el = document.querySelector(id);
 
+  el.addEventListener('mouseenter', () => {
+    el.setAttribute('scale', '0.7 0.7 0.7');
+  });
+
+  el.addEventListener('mouseleave', () => {
+    el.setAttribute('scale', '0.5 0.5 0.5');
+  });
+
+  el.addEventListener('click', () => {
+
+    fadeOutIn(() => {
+      // ✔ OPCIÓN SEGURA VR:
+      // abre en nueva pestaña SIN romper VR
+      window.open(url, '_blank');
+    });
+
+  });
+}
+
+// links
 setupVRLink('#miEnlace1','https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/');
 setupVRLink('#miEnlace2','https://carlatienzam-byte.github.io/EPE-Carmen-Lara-Gomez/');
 setupVRLink('#miEnlace3','https://carlatienzam-byte.github.io/EPE-Alejandra-Henche-de-Lucas/');
 setupVRLink('#miEnlace4','https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/');
 setupVRLink('#miEnlace5','https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/');
 
+// audio fix VR
 document.addEventListener('DOMContentLoaded', () => {
   const resumeAudio = () => {
     document.querySelectorAll('[sound]').forEach(e => {
@@ -139,8 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('click', resumeAudio);
   window.addEventListener('triggerdown', resumeAudio);
 });
-	
-	
 </script>
 </body>
 </html>
