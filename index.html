@@ -11,17 +11,54 @@
 <body>
 
 <script>
+
+	const spawnPoints = {
+
+  "#world_1": {
+    x: 0,
+    y: 0,
+    z: 0
+  },
+
+  "#world_2": {
+    x: 15,
+    y: 0,
+    z: 15
+  }
+
+};
+
+
 /* =========================
    🌌 MULTIVERSO CORE
 ========================= */
 
-function goWorld(id) {
-  document.querySelectorAll('[data-world]').forEach(w => {
-    w.setAttribute('visible', false);
+	function goWorld(id) {
+
+  document.querySelectorAll('[data-world]').forEach(world => {
+    world.setAttribute('visible', false);
   });
 
-  const target = document.querySelector(id);
-  if (target) target.setAttribute('visible', true);
+  const targetWorld = document.querySelector(id);
+
+  if (targetWorld) {
+    targetWorld.setAttribute('visible', true);
+  }
+
+  const rig = document.querySelector('#playerRig');
+
+  if (rig && spawnPoints[id]) {
+
+    const p = spawnPoints[id];
+
+    rig.object3D.position.set(
+      p.x,
+      p.y,
+      p.z
+    );
+
+  }
+
 }
 
 /* =========================
@@ -106,6 +143,8 @@ AFRAME.registerComponent('portal-energy', {
     this.el.setAttribute('rotation', `0 ${r} 0`);
   }
 });
+
+
 </script>
 
 <a-scene>
