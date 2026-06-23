@@ -144,8 +144,30 @@ AFRAME.registerComponent('portal-energy', {
     this.el.setAttribute('rotation', `0 ${r} 0`);
   }
 });
+/* =========================
+   🔥 Sonido eventos
+========================= */
+AFRAME.registerComponent('raycaster-sound', {
+  init: function () {
+    var el = this.el;
 
+    el.addEventListener('raycaster-intersected', function () {
+      // Desbloquea AudioContext si está suspendido (Quest)
+      var ctx = THREE.AudioContext.getContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().then(function () {
+          el.components.sound.playSound();
+        });
+      } else {
+        el.components.sound.playSound();
+      }
+    });
 
+    el.addEventListener('raycaster-intersected-cleared', function () {
+      el.components.sound.stopSound();
+    });
+  }
+});
 </script>
 
 <a-scene>
@@ -199,10 +221,19 @@ AFRAME.registerComponent('portal-energy', {
 
   <!-- 🌍 WORLD 2 -->
   <a-entity id="world_2" data-world="true" visible="false">
+<a-entity 
+	gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
+    position="-5 0 2"
+    rotation="0 -90 0"
+    id="rotativo"
+    geometry="primitive: box"
+    material="color: red"
+    sound="src: rotativo.mp3; autoplay: false; loop: false"
+  raycaster-sound>
+</a-entity>
 
-    <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
-                  position="-5 0 2"
-                  rotation="0 -90 0"></a-gltf-model>
+	</a-gltf-model>
+	  
 
     <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
 
