@@ -162,28 +162,39 @@ AFRAME.registerComponent('portal-aaa', {
 
 AFRAME.registerComponent('portal-energy', {
 
+  init: function () {
+
+    this.baseRotation =
+      this.el.getAttribute('rotation') || {x:0,y:0,z:0};
+
+  },
+
   tick: function () {
 
     const time = Date.now() * 0.002;
 
-    const scale =
+    const pulse =
       1 + Math.sin(time) * 0.08;
 
-    const rotation =
-      Date.now() * 0.03;
+    const spin =
+      (Date.now() * 0.03) % 360;
 
     this.el.setAttribute(
       'scale',
-      `${scale} ${scale} ${scale}`
+      `${pulse} ${pulse} ${pulse}`
     );
 
     this.el.setAttribute(
       'rotation',
-      `0 ${rotation} 0`
+      `${this.baseRotation.x}
+       ${this.baseRotation.y + spin}
+       ${this.baseRotation.z}`
     );
+
   }
 
 });
+
 
 /* =========================
    🚀 INICIO
@@ -192,31 +203,77 @@ AFRAME.registerComponent('portal-energy', {
 window.addEventListener('load', () => {
   goWorld('#world_1');
 });
+<script>
+
+function startAudio() {
+
+  const music =
+    document.querySelector('#music');
+
+  if (
+    music &&
+    music.components.sound &&
+    !music.components.sound.isPlaying
+  ) {
+
+    music.components.sound.playSound();
+
+  }
+
+}
+
+window.addEventListener('click', startAudio);
+
+window.addEventListener('triggerdown', startAudio);
+
+window.addEventListener('touchstart', startAudio);
 
 </script>
 
 <a-scene>
 
   <!-- 🎮 PLAYER -->
-  <a-entity id="playerRig"
-            movement-controls="speed: 0.3; fly: false">
+<a-entity id="playerRig"
+          position="0 0 0"
+          movement-controls="speed: 0.3; fly: false">
 
-    <a-entity camera look-controls position="0 1.6 0"></a-entity>
-
-    <a-entity laser-controls="hand: right"
-              raycaster="objects: .clickable"></a-entity>
-
-    <a-entity laser-controls="hand: left"
-              raycaster="objects: .clickable"></a-entity>
-
+  <a-entity camera
+            look-controls
+            position="0 1.6 0">
   </a-entity>
+
+  <a-entity id="rightHand"
+            laser-controls="hand: right"
+            raycaster="objects: .clickable"
+            cursor="rayOrigin: entity; fuse:false"
+            oculus-touch-controls="hand: right">
+  </a-entity>
+
+  <a-entity id="leftHand"
+            laser-controls="hand: left"
+            raycaster="objects: .clickable"
+            cursor="rayOrigin: entity; fuse:false"
+            oculus-touch-controls="hand: left">
+  </a-entity>
+
+</a-entity>
 
   <!-- 🌍 WORLD 1 (MAIN) -->
   <a-entity id="world_1" data-world="true">
 
-    <a-sound src="warm-nights.mp3"
-             autoplay="true"
-             sound="loop: true; volume: 10"></a-sound>
+<a-assets>
+
+  <audio id="bgmusic"
+         src="warm-nights.mp3"
+         preload="auto"
+         loop>
+  </audio>
+
+</a-assets>
+
+<a-entity id="music"
+          sound="src:#bgmusic; autoplay:false; loop:true; volume:10">
+</a-entity>
 
     <a-gltf-model src="backrooms_vr.glb"
                   scale="1.25 1.25 1.25"></a-gltf-model>
@@ -229,18 +286,22 @@ window.addEventListener('load', () => {
     <a-sky color="#b28f50"></a-sky>
 
     <!-- 🔮 PORTAL → WORLD 2 -->
-    <a-entity id="portal_world2"
-              class="clickable"
-              geometry="primitive: torus; radius: 1"
-              material="color: #7c3cff; emissive: #aa55ff; emissiveIntensity: 2"
-              position="6.20096 1.76034 6.61931"
-			  scale="0.75 0.75 0.75"
-			  rotation="0 90 0"
-              portal-aaa="target: #world_2; radius: 2.2"
-              portal-energy>
-    </a-entity>
+ 
 	 
-   
+   <a-entity id="portal_world2"
+          class="clickable"
+          geometry="primitive: torus; radius: 1"
+          material="color: #7c3cff; emissive: #aa55ff; emissiveIntensity: 2"
+          position="6.20096 1.76034 6.61931"
+          scale="0.75 0.75 0.75"
+          rotation="0 90 0"
+          portal-aaa="target: #world_2; radius: 2.2"
+          portal-energy
+
+          event-set__enter="_event: mouseenter; scale: 1 1 1"
+          event-set__leave="_event: mouseleave; scale: 0.75 0.75 0.75">
+
+</a-entity>
   
   </a-entity>
 
@@ -268,18 +329,22 @@ window.addEventListener('load', () => {
                 scale="0.2 0.2 0.2"></a-cylinder>
 
     <!-- 🔮 PORTAL DE VUELTA -->
-    <a-entity id="portal_back_to_main"
-              class="clickable"
-              geometry="primitive: torus; radius: 1"
-              material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 2"
-              position="9.92611 1.96798 -3.91934"
-			  scale="0.75 0.75 0.75" 
-			  rotation="0 90 0"
-              portal-aaa="target: #world_1; radius: 2.2"
-              portal-energy>
-    </a-entity>
+   
 
-	 
+	 <a-entity id="portal_back_to_main"
+          class="clickable"
+          geometry="primitive: torus; radius: 1"
+          material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 2"
+          position="9.92611 1.96798 -3.91934"
+          scale="0.75 0.75 0.75"
+          rotation="0 90 0"
+          portal-aaa="target: #world_1; radius: 2.2"
+          portal-energy
+
+          event-set__enter="_event: mouseenter; scale: 1 1 1"
+          event-set__leave="_event: mouseleave; scale: 0.75 0.75 0.75">
+
+</a-entity>
 	  
   </a-entity>
 
