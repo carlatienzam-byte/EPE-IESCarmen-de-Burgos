@@ -308,15 +308,44 @@ window.addEventListener('touchstart', startAudio);
   <!-- 🌍 WORLD 2 -->
   <a-entity id="world_2" data-world="true" visible="false">
 
-    <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
-                  position="-5 0 2"
-                  rotation="0 -90 0"></a-gltf-model>
+  <a-entity class="clickable"
+          position="-5 0 2">
+
+  <!-- MODELO VISUAL -->
+  <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
+                rotation="0 -90 0">
+  </a-gltf-model>
+
+  <!-- HITBOX INTERACTIVA -->
+  <a-box width="4"
+         height="2"
+         depth="2"
+         opacity="0"
+         event-set__enter="_event: mouseenter; material.color: green"
+         event-set__leave="_event: mouseleave; material.color: red"
+	     sound="src:#rotativo; on:mouseenter">
+  </a-box>
+
+</a-entity>
 
     <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
 
-    <a-gltf-model src="truck_opt.glb"
-                  position="-29 2.3 20"
-                  rotation="0 -20 0"></a-gltf-model>
+<a-entity class="clickable"
+          position="-29 2.3 20">
+
+  <a-gltf-model src="truck_opt.glb"
+                rotation="0 -20 0"
+                sound="src:#Camion1; on:mouseenter">
+  </a-gltf-model>
+
+  <a-box width="5"
+         height="3"
+         depth="6"
+         opacity="0"
+         sound="src:#Camion1; on:mouseenter">
+  </a-box>
+
+</a-entity>
 
     <a-gltf-model src="Sol_opt.glb"
                   position="-120 200 160"></a-gltf-model>
