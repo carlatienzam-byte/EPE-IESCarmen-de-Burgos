@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component@5.x.x/dist/aframe-event-set-component.min.js"></script>
-	  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
+	 <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
 </head>
 <body>
@@ -13,6 +13,9 @@
   <a-assets>
     <audio id="bgmusic" src="warm-nights.mp3" preload="auto" autoplay loop></audio>
   </a-assets>
+	
+	 <a-entity sound="src: #bgmusic; autoplay: true; loop: true; volume: 20"
+            position="-38.38629 7.52826 6.26842"></a-entity>
 
   <a-gltf-model src="backrooms_vr.glb" scale="1.25 1.25 1.25" position="0 0 0"></a-gltf-model>
 
@@ -23,18 +26,50 @@
   <a-sky color="#b28f50"></a-sky>
 
 
+<a-link
+    id="miEnlace1"
+    class="clickable"
+    src="Sala Gasolinera.png"
+    href="https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/"
+    title="Sala Gasolinera"
+    position="6.4927 0.948 6.76992"
+    scale="0.5 0.5 0.5">
+</a-link>
+	
+  <a-link id="miEnlace2"
+		  class="clickable"
+		  src="Japanese Period.png" 
+		  href="https://carlatienzam-byte.github.io/EPE-Carmen-Lara-Gomez/" 
+		  title="Sala Japanese Period" position="-42.05693 1.3171 -4.44459" 
+		  scale="0.5 0.5 0.5">
+	</a-link>
+	
+  <a-link id="miEnlace3"
+		  class="clickable"
+		  src="Strange World.png" 
+		  href="https://carlatienzam-byte.github.io/EPE-Alejandra-Henche-de-Lucas/" 
+		  title="Strange World" 
+		  position="-54.32779 1.14831 8.06231" 
+		  scale="0.5 0.5 0.5">
+	</a-link>
+	
+  <a-link id="miEnlace4" 
+		  class="clickable"
+		  src="The Simpsons.jpg"  
+		  href="https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/" 
+		  title="The Simpsons" 
+		  position="-53.73499 1.76586 -4.54693" 
+		  scale="0.5 0.5 0.5"></a-link>
+	
+  <a-link id="miEnlace5"
+		  class="clickable"
+		  src="AdventureTime.jpg"  
+		  href="https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/" 
+		  title="Adventure Time" 
+		  position="-79.05526 1.66112 18.02414" 
+		  scale="0.5 0.5 0.5"></a-link>
 
-  <a-link id="miEnlace1"  src="Sala Gasolinera.png" href="https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/" title="Sala Gasolinera" position="6.4927 0.948 6.76992" scale="0.5 0.5 0.5" geometry="primitive: circle; segments: 64" material="shader: portal; side: double; previewDistance: 7.5" rotation="0 -90 0"><a-entity text="align: center; color: white; font: kelsonsans; value: Sala Gasolinera; width: 5" position="0 1.5 0"></a-entity></a-link>
-	
-  <a-link id="miEnlace2"  src="Japanese Period.png" href="https://carlatienzam-byte.github.io/EPE-Carmen-Lara-Gomez/" title="Sala Japanese Period" position="-42.05693 1.3171 -4.44459" scale="0.5 0.5 0.5"></a-link>
-	
-  <a-link id="miEnlace3"  src="Strange World.png" href="https://carlatienzam-byte.github.io/EPE-Alejandra-Henche-de-Lucas/" title="Strange World" position="-54.32779 1.14831 8.06231" scale="0.5 0.5 0.5"></a-link>
-	
-  <a-link id="miEnlace4" src="The Simpsons.jpg"  href="https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/" title="The Simpsons" position="-53.73499 1.76586 -4.54693" scale="0.5 0.5 0.5"></a-link>
-	
-  <a-link id="miEnlace5" src="AdventureTime.jpg"  href="https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/" title="Adventure Time" position="-79.05526 1.66112 18.02414" scale="0.5 0.5 0.5"></a-link>
-
-    <!-- Inicio entidad completa para camara y movimiento -->
+  <!-- Inicio entidad completa para camara y movimiento -->
              <a-entity
         id="playerRig"
         position="0 0 0"
@@ -42,47 +77,50 @@
         universal-controls="movementEnabled: true;"
       >
          <!-- Controlador mano derecha -->
-      <a-entity
-        laser-controls="hand: right; model: true"
-        raycaster="objects: .clickable"
-        line="color: red; opacity: 0.8"
-         id="rightHand" 
-        oculus-touch-controls="hand: right; model: true"
-                >
-      </a-entity>
+  			 
+<a-entity
+    id="rightHand"
+    laser-controls="hand: right"
+    raycaster="objects: .clickable"
+    cursor="rayOrigin: entity; fuse: false"
+    oculus-touch-controls="hand: right">
+</a-entity>
 
       <!-- Controlador mano izquierda (opcional) -->
-      <a-entity
-        laser-controls="hand: left; model: true"
-        raycaster="objects: .clickable"
-        line="color: blue; opacity: 0.8"
-        id="leftHand" 
-        oculus-touch-controls="hand: left; model: true">
-      </a-entity>
+   <a-entity
+    id="leftHand"
+    laser-controls="hand: left"
+    raycaster="objects: .clickable"
+    cursor="rayOrigin: entity; fuse: false"
+    oculus-touch-controls="hand: left">
+</a-entity>
          
       <a-entity camera look-controls position="0 1.6 0"></a-entity>
          </a-entity>
 <!-- Fin entidad completa -->
        
-
 </a-scene>
 
 <script>
-function setupVRLink(id, url) {
-  const el = document.querySelector(id);
+	
+	function setupVRLink(id, url) {
+    const el = document.querySelector(id);
 
-  el.addEventListener('mouseenter', () => {
-    el.setAttribute('scale', '0.7 0.7 0.7');
-  });
+    el.addEventListener('mouseenter', () => {
+        el.setAttribute('scale', '0.7 0.7 0.7');
+    });
 
-  el.addEventListener('mouseleave', () => {
-    el.setAttribute('scale', '0.5 0.5 0.5');
-  });
+    el.addEventListener('mouseleave', () => {
+        el.setAttribute('scale', '0.5 0.5 0.5');
+    });
 
-  const go = () => window.location.href = url;
-
-  el.addEventListener('click', go);
+    el.addEventListener('click', () => {
+        window.location.href = url;
+    });
 }
+	
+	
+
 
 setupVRLink('#miEnlace1','https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/');
 setupVRLink('#miEnlace2','https://carlatienzam-byte.github.io/EPE-Carmen-Lara-Gomez/');
@@ -90,8 +128,19 @@ setupVRLink('#miEnlace3','https://carlatienzam-byte.github.io/EPE-Alejandra-Henc
 setupVRLink('#miEnlace4','https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/');
 setupVRLink('#miEnlace5','https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/');
 
+document.addEventListener('DOMContentLoaded', () => {
+  const resumeAudio = () => {
+    document.querySelectorAll('[sound]').forEach(e => {
+      const s = e.components.sound;
+      if (s) s.playSound();
+    });
+  };
 
+  window.addEventListener('click', resumeAudio);
+  window.addEventListener('triggerdown', resumeAudio);
 });
+	
+	
 </script>
 </body>
 </html>
