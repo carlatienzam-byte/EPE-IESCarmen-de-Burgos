@@ -149,22 +149,23 @@ AFRAME.registerComponent('portal-energy', {
 ========================= */
 AFRAME.registerComponent('raycaster-sound', {
   init: function () {
-    var el = this.el;
+    var el    = this.el;
+    var hover = false;
 
-    el.addEventListener('raycaster-intersected', function () {
-      // Desbloquea AudioContext si está suspendido (Quest)
-      var ctx = THREE.AudioContext.getContext();
-      if (ctx && ctx.state === 'suspended') {
-        ctx.resume().then(function () {
-          el.components.sound.playSound();
-        });
-      } else {
-        el.components.sound.playSound();
-      }
-    });
+    el.addEventListener('raycaster-intersected',         function () { hover = true;  });
+    el.addEventListener('raycaster-intersected-cleared', function () { hover = false; });
 
-    el.addEventListener('raycaster-intersected-cleared', function () {
-      el.components.sound.stopSound();
+    ['triggerdown', 'click'].forEach(function (ev) {
+      document.addEventListener(ev, function () {
+        if (!hover) return;
+        var ctx = THREE.AudioContext.getContext();
+        var toggle = function () {
+          var s = el.components.sound;
+          if (!s) return;
+          s.isPlaying ? s.stopSound() : s.playSound();
+        };
+        ctx && ctx.state === 'suspended' ? ctx.resume().then(toggle) : toggle();
+      });
     });
   }
 });
@@ -225,15 +226,14 @@ AFRAME.registerComponent('raycaster-sound', {
 
   <!-- 🌍 WORLD 2 -->
   <a-entity id="world_2" data-world="true" visible="false">
- <a-entity
-	gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
-    position="-5 0 2"
-	class="clickable"
-    rotation="0 -90 0"
-    id="rotativo"
-    sound="src: rotativo.mp3; autoplay: false; loop: false"
-    raycaster-sound>
-	</a-entity>
+<!-- El modelo necesita clase .clickable para que el raycaster lo detecte -->
+<a-gltf-model
+  id="mazda"
+  src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
+  class="clickable"
+  sound="src: rotativo.mp3; autoplay: false; loop: false"
+  raycaster-sound>
+</a-gltf-model>
 
 	
 	  
