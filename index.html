@@ -32,21 +32,36 @@
 	
   <a-link id="miEnlace5" src="AdventureTime.jpg"  href="https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/" title="Adventure Time" position="-79.05526 1.66112 18.02414" scale="0.5 0.5 0.5"></a-link>
 
-  <!-- VR Rig -->
-  <a-entity id="rig" position="0 0 0" movement-controls>
-    <a-camera></a-camera></a-entity>
+    <!-- Inicio entidad completa para camara y movimiento -->
+             <a-entity
+        id="playerRig"
+        position="0 0 0"
+        movement-controls="speed: 0.3; fly: false;"
+        universal-controls="movementEnabled: true;"
+      >
+         <!-- Controlador mano derecha -->
+      <a-entity
+        laser-controls="hand: right; model: true"
+        raycaster="objects: .clickable"
+        line="color: red; opacity: 0.8"
+         id="rightHand" 
+        oculus-touch-controls="hand: right; model: true"
+                >
+      </a-entity>
 
-  <a-entity
-    laser-controls="hand: right"
-    raycaster="objects: a-link"
-    cursor="rayOrigin: entity; fuse: false">
-</a-entity>
-
-  <a-entity
-    laser-controls="hand: left"
-    raycaster="objects: a-link"
-    cursor="rayOrigin: entity; fuse: false">
-</a-entity>
+      <!-- Controlador mano izquierda (opcional) -->
+      <a-entity
+        laser-controls="hand: left; model: true"
+        raycaster="objects: .clickable"
+        line="color: blue; opacity: 0.8"
+        id="leftHand" 
+        oculus-touch-controls="hand: left; model: true">
+      </a-entity>
+         
+      <a-entity camera look-controls position="0 1.6 0"></a-entity>
+         </a-entity>
+<!-- Fin entidad completa -->
+       
 
 </a-scene>
 
@@ -65,7 +80,6 @@ function setupVRLink(id, url) {
   const go = () => window.location.href = url;
 
   el.addEventListener('click', go);
-  el.addEventListener('triggerdown', go);   // Meta Quest trigger
 }
 
 setupVRLink('#miEnlace1','https://carlatienzam-byte.github.io/EPE-Alberto_Santin-Vera/');
