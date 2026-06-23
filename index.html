@@ -51,7 +51,7 @@ AFRAME.registerComponent('portal-aaa', {
 
     // 🌀 portal vivo
     const s = 1 + Math.sin(Date.now() * 0.004) * 0.06;
-    this.el.setAttribute('scale', ${s} ${s} ${s});
+    this.el.setAttribute('scale', `${s} ${s} ${s}`);
 
     if (dist < this.data.radius && Date.now() - this.last > this.data.cooldown) {
       this.last = Date.now();
@@ -102,8 +102,8 @@ AFRAME.registerComponent('portal-energy', {
     const s = 1 + Math.sin(t) * 0.08;
     const r = Date.now() * 0.03;
 
-    this.el.setAttribute('scale', ${s} ${s} ${s});
-    this.el.setAttribute('rotation', 0 ${r} 0);
+    this.el.setAttribute('scale', `${s} ${s} ${s}`);
+    this.el.setAttribute('rotation', `0 ${r} 0`);
   }
 });
 </script>
