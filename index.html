@@ -4,50 +4,31 @@
   <meta charset="utf-8">
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component@5.x.x/dist/aframe-event-set-component.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
 </head>
 
 <body>
 
 <script>
-
 /* =========================
-   POSICIONES
-========================= */
-
-const spawnPoints = {
-  "#world_1": {x: 0, y: 0, z: 0, rotY: 0},
-  "#world_2": {x: 0, y: 0, z: 0, rotY: 180}
-};
-
-/* =========================
-   CAMBIO DE MUNDO
+   🌌 MULTIVERSO CORE
 ========================= */
 
 function goWorld(id) {
-
-  document.querySelectorAll('[data-world]')
-    .forEach(w => w.setAttribute('visible', false));
+  document.querySelectorAll('[data-world]').forEach(w => {
+    w.setAttribute('visible', false);
+  });
 
   const target = document.querySelector(id);
   if (target) target.setAttribute('visible', true);
-
-  const rig = document.querySelector('#playerRig');
-
-  if (rig && spawnPoints[id]) {
-    const p = spawnPoints[id];
-
-    rig.object3D.position.set(p.x, p.y, p.z);
-    rig.setAttribute('rotation', `0 ${p.rotY} 0`);
-  }
 }
 
 /* =========================
-   PORTAL AAA (VR FIXED)
+   🔮 PORTAL AAA (MARVEL STYLE)
 ========================= */
 
 AFRAME.registerComponent('portal-aaa', {
-
   schema: {
     target: {type: 'string'},
     radius: {type: 'number', default: 2.2},
@@ -60,9 +41,6 @@ AFRAME.registerComponent('portal-aaa', {
   },
 
   tick: function () {
-
-    if (!this.player) return;
-
     const p = new THREE.Vector3();
     const m = new THREE.Vector3();
 
@@ -71,171 +49,152 @@ AFRAME.registerComponent('portal-aaa', {
 
     const dist = p.distanceTo(m);
 
+    // 🌀 portal vivo
+    const s = 1 + Math.sin(Date.now() * 0.004) * 0.06;
+    this.el.setAttribute('scale', ${s} ${s} ${s});
+
     if (dist < this.data.radius && Date.now() - this.last > this.data.cooldown) {
       this.last = Date.now();
-      this.teleport();
+      this.absorb();
     }
   },
 
-  teleport: function () {
+  absorb: function () {
+    const target = this.data.target;
 
     let fade = document.querySelector('#fade');
 
     if (!fade) {
       fade = document.createElement('a-plane');
       fade.setAttribute('id', 'fade');
-      fade.setAttribute('material', 'color:black; opacity:0');
+      fade.setAttribute('position', '0 0 -0.5');
       fade.setAttribute('width', '5');
       fade.setAttribute('height', '5');
-
+      fade.setAttribute('material', 'color: black; opacity: 0');
       document.querySelector('a-scene').appendChild(fade);
     }
 
-    fade.setAttribute('animation', 'property: material.opacity; to: 1; dur: 200');
+    fade.setAttribute('animation', {
+      property: 'material.opacity',
+      to: 1,
+      dur: 250
+    });
 
     setTimeout(() => {
-      goWorld(this.data.target);
-      fade.setAttribute('animation', 'property: material.opacity; to: 0; dur: 400');
-    }, 200);
+      goWorld(target);
+
+      fade.setAttribute('animation', {
+        property: 'material.opacity',
+        to: 0,
+        dur: 500
+      });
+    }, 250);
   }
 });
 
 /* =========================
-   PORTAL ENERGY
+   🔥 ENERGY PORTAL
 ========================= */
 
 AFRAME.registerComponent('portal-energy', {
-
-  init: function () {
-    this.base = this.el.getAttribute('rotation') || {x:0,y:0,z:0};
-  },
-
   tick: function () {
-
     const t = Date.now() * 0.002;
+    const s = 1 + Math.sin(t) * 0.08;
+    const r = Date.now() * 0.03;
 
-    const pulse = 1 + Math.sin(t) * 0.08;
-    const spin = Date.now() * 0.02;
-
-    this.el.setAttribute('scale', `${pulse} ${pulse} ${pulse}`);
-    this.el.setAttribute('rotation',
-      `${this.base.x} ${this.base.y + spin} ${this.base.z}`
-    );
+    this.el.setAttribute('scale', ${s} ${s} ${s});
+    this.el.setAttribute('rotation', 0 ${r} 0);
   }
 });
-
-/* =========================
-   VR AUDIO FIX
-========================= */
-
-function startAudio() {
-  const music = document.querySelector('#music');
-  if (music?.components?.sound) music.components.sound.playSound();
-}
-
-window.addEventListener('click', startAudio);
-window.addEventListener('triggerdown', startAudio);
-window.addEventListener('touchstart', startAudio);
-
-/* =========================
-   INIT
-========================= */
-
-window.addEventListener('load', () => goWorld('#world_1'));
-
 </script>
 
 <a-scene>
 
-<!-- PLAYER VR CORRECTO -->
-<a-entity id="playerRig"
-          movement-controls="speed:0.3">
+  <!-- 🎮 PLAYER -->
+  <a-entity id="playerRig"
+            movement-controls="speed: 0.3; fly: false">
 
-  <a-entity camera look-controls position="0 1.6 0"></a-entity>
+    <a-entity camera look-controls position="0 1.6 0"></a-entity>
 
-  <!-- 🔥 IMPORTANTE: VR RAYCASTER REAL -->
-  <a-entity id="rightHand"
-            laser-controls="hand:right"
-            raycaster="objects: .clickable"
-            cursor="rayOrigin: entity; fuse:false"
-            line="color:red">
-  </a-entity>
+    <a-entity laser-controls="hand: right"
+              raycaster="objects: .clickable"></a-entity>
 
-  <a-entity id="leftHand"
-            laser-controls="hand:left"
-            raycaster="objects: .clickable"
-            cursor="rayOrigin: entity; fuse:false"
-            line="color:blue">
-  </a-entity>
-
-</a-entity>
-
-<!-- ASSETS -->
-<a-assets>
-  <audio id="bgmusic" src="warm-nights.mp3" loop></audio>
-  <audio id="Camion1" src="camion.mp3"></audio>
-  <audio id="rotativo" src="rotativo.mp3"></audio>
-</a-assets>
-
-<!-- WORLD 1 -->
-<a-entity id="world_1" data-world="true">
-
-  <a-entity id="music"
-            sound="src:#bgmusic; autoplay:false; loop:true; volume:10"></a-entity>
-
-  <a-gltf-model src="backrooms_vr.glb"
-                scale="1.25 1.25 1.25"></a-gltf-model>
-
-  <a-sky color="#b28f50"></a-sky>
-
-  <!-- PORTAL -->
-  <a-entity class="clickable"
-            geometry="primitive: torus; radius: 1"
-            material="color:#7c3cff; emissive:#aa55ff"
-            position="6 1.7 6"
-            portal-aaa="target:#world_2"
-            portal-energy>
-  </a-entity>
-
-</a-entity>
-
-<!-- WORLD 2 -->
-<a-entity id="world_2" visible="false" data-world="true">
-
-  <!-- CAR + HITBOX (IMPORTANTE PARA VR) -->
-  <a-entity class="clickable" position="-5 0 2">
-
-    <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"></a-gltf-model>
-
-    <a-box opacity="0"
-           width="4" height="2" depth="2"
-           sound="src:#rotativo; on:mouseenter">
-    </a-box>
+    <a-entity laser-controls="hand: left"
+              raycaster="objects: .clickable"></a-entity>
 
   </a-entity>
 
-  <!-- TRUCK -->
-  <a-entity class="clickable" position="-29 2 20">
+  <!-- 🌍 WORLD 1 (MAIN) -->
+  <a-entity id="world_1" data-world="true">
 
-    <a-gltf-model src="truck_opt.glb"></a-gltf-model>
+    <a-sound src="warm-nights.mp3"
+             autoplay="true"
+             sound="loop: true; volume: 10"></a-sound>
 
-    <a-box opacity="0"
-           width="5" height="3" depth="6"
-           sound="src:#Camion1; on:mouseenter">
-    </a-box>
+    <a-gltf-model src="backrooms_vr.glb"
+                  scale="1.25 1.25 1.25"></a-gltf-model>
 
+    <a-plane rotation="-90 0 0"
+             width="50" height="50"
+             position="0 -4.344 0"
+             material="color: #ba9652"></a-plane>
+
+    <a-sky color="#b28f50"></a-sky>
+
+    <!-- 🔮 PORTAL → WORLD 2 -->
+    <a-entity id="portal_world2"
+              class="clickable"
+              geometry="primitive: torus; radius: 1"
+              material="color: #7c3cff; emissive: #aa55ff; emissiveIntensity: 2"
+              position="6.20096 1.76034 6.61931"
+			  scale="0.75 0.75 0.75"
+			  rotation="0 90 0"
+              portal-aaa="target: #world_2; radius: 2.2"
+              portal-energy>
+    </a-entity>
+	 
+   
+  
   </a-entity>
 
-  <!-- RETURN PORTAL -->
-  <a-entity class="clickable"
-            geometry="primitive: torus; radius: 1"
-            material="color:#00ffff; emissive:#00ffff"
-            position="10 2 -4"
-            portal-aaa="target:#world_1"
-            portal-energy>
-  </a-entity>
+  <!-- 🌍 WORLD 2 -->
+  <a-entity id="world_2" data-world="true" visible="false">
 
-</a-entity>
+    <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
+                  position="-5 0 2"
+                  rotation="0 -90 0"></a-gltf-model>
+
+    <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
+
+    <a-gltf-model src="truck_opt.glb"
+                  position="-29 2.3 20"
+                  rotation="0 -20 0"></a-gltf-model>
+
+    <a-gltf-model src="Sol_opt.glb"
+                  position="-120 200 160"></a-gltf-model>
+
+    <a-gltf-model src="cielo_opt.glb"
+                  scale="300 300 300"></a-gltf-model>
+
+    <a-cylinder color="red"
+                position="0 1 4.34"
+                scale="0.2 0.2 0.2"></a-cylinder>
+
+    <!-- 🔮 PORTAL DE VUELTA -->
+    <a-entity id="portal_back_to_main"
+              class="clickable"
+              geometry="primitive: torus; radius: 1"
+              material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 2"
+              position="17.62962 1.96798 12.45876"
+			  scale="0.75 0.75 0.75" 
+			  rotation="0 90 0"
+              portal-aaa="target: #world_1; radius: 2.2"
+              portal-energy>
+    </a-entity>
+
+	  
+	  
+  </a-entity>
 
 </a-scene>
 
