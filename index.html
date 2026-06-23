@@ -90,16 +90,7 @@ setupVRLink('#miEnlace3','https://carlatienzam-byte.github.io/EPE-Alejandra-Henc
 setupVRLink('#miEnlace4','https://carlatienzam-byte.github.io/EPE-Laura-Sofia-Aguirre/');
 setupVRLink('#miEnlace5','https://carlatienzam-byte.github.io/EPE-Pilar-Montalvo-Velasco/');
 
-document.addEventListener('DOMContentLoaded', () => {
-  const resumeAudio = () => {
-    document.querySelectorAll('[sound]').forEach(e => {
-      const s = e.components.sound;
-      if (s) s.playSound();
-    });
-  };
 
-  window.addEventListener('click', resumeAudio);
-  window.addEventListener('triggerdown', resumeAudio);
 });
 </script>
 </body>
