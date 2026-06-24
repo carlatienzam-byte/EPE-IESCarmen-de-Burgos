@@ -24,7 +24,13 @@
     x: 15,
     y: 0,
     z: 15
-  }
+  },
+
+		"#world_3": {
+  x: 0,
+  y: 0,
+  z: 0
+}
 
 };
 
@@ -272,7 +278,237 @@ AFRAME.registerComponent('raycaster-sound', {
 	  
 	  
   </a-entity>
+ <!-- 🌍 WORLD 3 -->
+	
+<a-entity id="world_3" data-world="true" visible="false">
 
+  <!-- 🎵 sonido ambiente -->
+  <a-sound src="musica.mp3"
+           autoplay="true"
+           loop="true"
+           volume="0.5"></a-sound>
+
+  <!-- 🌱 suelo -->
+  <a-plane rotation="-90 0 0"
+           scale="500 500 500"
+           width="4"
+           height="4"
+           color="#3B5110"></a-plane>
+
+  <!-- 💡 luz ambiente -->
+  <a-light type="ambient" color="#AFEEEE"></a-light>
+
+  <!-- 🏯 templo -->
+  <a-gltf-model id="templo"
+    src="https://cdn.tinyglb.com/models/4a2392a6fa04477493b9015416cf0571.glb"
+    position="0 0 -40"
+    scale="0.01 0.01 0.01">
+  </a-gltf-model>
+
+  <!-- ⛩️ torii -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/26df246b648249448a9a85552e3e07bd.glb"
+    position="0 0 -15"
+    scale="14 14 14">
+  </a-gltf-model>
+
+  <!-- 🏪 tienda -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/c728a8c818a148aeab0f867e2e917b66.glb"
+    position="-30 0 5"
+    scale="1 1 1"
+    rotation="0 90 0">
+  </a-gltf-model>
+
+  <!-- 🏡 casa -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/5fb5871d0e6b46868efd2a1f92bc8704.glb"
+    position="-30 0 -20"
+    scale="1.5 1.5 1.5"
+    rotation="0 55 0">
+  </a-gltf-model>
+
+  <!-- 🌊 cascada -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/783d20c383b14c77a3c02175dfe4d5ea.glb"
+    position="40 9 -28"
+    scale="0.1 0.1 0.1">
+  </a-gltf-model>
+
+  <!-- 🌌 cielo giratorio -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/262ef18899b449b798df4de8d079b5e2.glb"
+    position="30 0 -49"
+    scale="40 40 40"
+    animation="property: rotation; to: 0 360 0; loop: true; dur: 700000; easing: linear">
+  </a-gltf-model>
+
+  <!-- 🌄 montañas -->
+  <a-gltf-model src="https://cdn.tinyglb.com/models/8719c13ab9a5456c9e80ba55cc33ef31.glb"
+    position="100 0 -300"
+    scale="200 200 200">
+  </a-gltf-model>
+
+  <a-gltf-model src="https://cdn.tinyglb.com/models/8719c13ab9a5456c9e80ba55cc33ef31.glb"
+    position="-100 0 -300"
+    scale="200 200 200">
+  </a-gltf-model>
+
+  <!-- 🌸 cerezo interactivo -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb"
+    position="-20 0 -40"
+    scale="40 40 40"
+    class="clickable"
+    event-set__enter="_event: mouseenter; _target: #petalos; visible: true"
+    event-set__leave="_event: mouseleave; _target: #petalos; visible: false">
+  </a-gltf-model>
+
+  <!-- 🌸 pétalos -->
+  <a-entity id="petalos" visible="false">
+    <a-plane position="-20 8 -40" width="0.3" height="0.15" color="#ffc0cb"
+      animation="property: position; to: -18 0 -41; dur: 5000; loop: true"></a-plane>
+
+    <a-plane position="-21 9 -39" width="0.25" height="0.12" color="#ffb6c1"
+      animation="property: position; to: -22 0 -42; dur: 6500; loop: true"></a-plane>
+  </a-entity>
+
+  <!-- 🧘 pozo -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/54b114fb59464f7a9f1dcbe083fbbd0e.glb"
+    position="38 0 -37.5"
+    scale="3 3 3"
+    class="clickable"
+    event-set__enter="_event: mouseenter; _target: #mensajePozo; visible: true"
+    event-set__leave="_event: mouseleave; _target: #mensajePozo; visible: false">
+  </a-gltf-model>
+
+  <!-- 💬 mensaje -->
+  <a-text id="mensajePozo"
+    value="静かな心は水のよう\nA calm heart is like water"
+    position="34 6 -37.5"
+    rotation="0 -70 0"
+    width="20"
+    visible="false"
+    animation="property: position; dir: alternate; dur: 2000; loop: true; to: 34 6.5 -37.5">
+  </a-text>
+
+  <!-- 🧍 samurai -->
+  <a-gltf-model
+    src="https://cdn.tinyglb.com/models/a66f326b06a84414b377269da9d6d355.glb"
+    position="-20 6.7 -28"
+    scale="0.004 0.004 0.004">
+  </a-gltf-model>
+
+  <!-- 🔗 LINK adaptado VR -->
+  <a-entity id="miEnlace1"
+            class="clickable"
+            geometry="primitive: circle"
+            material="color: #000; opacity: 0.3"
+            position="45 3 19"
+            raycaster-sound>
+  </a-entity>
+
+  <a-text value="Backrooms"
+          position="45 4 19"
+          align="center"
+          width="6"></a-text>
+
+</a-entity>
+	  <!-- 🔮 PORTAL DE VUELTA -->
+<!-- ⛩️ TORII AAA PORTAL (JAPAN → MAIN) -->
+<a-entity id="portal_torii_aaa"
+          class="clickable"
+          position="45 1.2 19"
+          rotation="0 90 0"
+          scale="1.3 1.3 1.3"
+          portal-aaa="target: #world_1; radius: 2.2"
+          portal-energy>
+
+  <!-- ===================== -->
+  <!-- 🏯 ESTRUCTURA TORII -->
+  <!-- ===================== -->
+
+  <!-- pilares -->
+  <a-box position="-0.9 1 0"
+         width="0.25" height="3" depth="0.25"
+         color="#b30000"></a-box>
+
+  <a-box position="0.9 1 0"
+         width="0.25" height="3" depth="0.25"
+         color="#b30000"></a-box>
+
+  <!-- travesaño inferior -->
+  <a-box position="0 2.1 0"
+         width="2.2" height="0.25" depth="0.25"
+         color="#7a0000"></a-box>
+
+  <!-- travesaño superior -->
+  <a-box position="0 2.6 0"
+         width="2.8" height="0.25" depth="0.25"
+         color="#ff2a2a"></a-box>
+
+  <!-- ===================== -->
+  <!-- 🌸 ENERGÍA / VIDA -->
+  <!-- ===================== -->
+
+  <!-- núcleo energético -->
+  <a-sphere radius="0.4"
+            position="0 1.8 0"
+            material="color: #ff3df2; emissive: #ff3df2; emissiveIntensity: 2; opacity: 0.8"
+            animation="property: scale; to: 1.4 1.4 1.4; dir: alternate; loop: true; dur: 900">
+  </a-sphere>
+
+  <!-- anillo energético -->
+  <a-torus radius="1.2"
+           radius-tubular="0.05"
+           rotation="90 0 0"
+           material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 1.5"
+           animation="property: rotation; to: 90 360 0; loop: true; dur: 4000">
+  </a-torus>
+
+  <!-- ===================== -->
+  <!-- 🌸 PARTÍCULAS SAKURA -->
+  <!-- ===================== -->
+
+  <a-entity id="sakura_particles">
+
+    <a-plane position="0 3 0"
+             width="0.2" height="0.2"
+             material="color: #ffb7c5; opacity: 0.8; transparent: true"
+             animation="property: position; to: 2 -2 0; dur: 5000; loop: true"></a-plane>
+
+    <a-plane position="1 3 0.5"
+             width="0.15" height="0.15"
+             material="color: #ffd1dc; opacity: 0.7; transparent: true"
+             animation="property: position; to: -1 -3 0; dur: 6500; loop: true"></a-plane>
+
+    <a-plane position="-1 3 -0.5"
+             width="0.18" height="0.18"
+             material="color: #ff9fb0; opacity: 0.6; transparent: true"
+             animation="property: position; to: 1 -3 0; dur: 5500; loop: true"></a-plane>
+
+  </a-entity>
+
+  <!-- ===================== -->
+  <!-- 🔊 SONIDO PORTAL -->
+  <!-- ===================== -->
+
+  <a-sound src="portal_whoosh.mp3"
+           autoplay="false"
+           volume="1"
+           position="0 1 0"></a-sound>
+
+  <!-- ===================== -->
+  <!-- 🌫️ NIEBLA INTERNA -->
+  <!-- ===================== -->
+
+  <a-entity light="type: point; color: #ff66cc; intensity: 2; distance: 6"
+            position="0 2 0">
+  </a-entity>
+
+</a-entity>
+	
 </a-scene>
 
 </body>
