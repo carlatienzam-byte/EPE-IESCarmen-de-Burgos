@@ -349,6 +349,7 @@ function playWorldMusic(id) {
 
     <a-cylinder
         position="40 10 -5"
+        class="clickable"
         scale="0.5 21 0.5"
         color="brown"
         event-set__enter="_event: raycaster-intersected; _target: #flag; visible: true"
@@ -420,6 +421,7 @@ function playWorldMusic(id) {
 
     <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
         position="-20 0 -40" 
+        class="clickable"
         scale="40 40 40"
         event-set__enter="_event: raycaster-intersected; _target: #petalos; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #petalos; visible: false">
@@ -507,13 +509,14 @@ function playWorldMusic(id) {
 
     <a-gltf-model src="https://cdn.tinyglb.com/models/54b114fb59464f7a9f1dcbe083fbbd0e.glb" 
         position="38 0 -37.5" scale="3 3 3" rotation="0 100 0"
+        class="clickable"
         event-set__enter="_event: raycaster-intersected; _target: #mensajePozo; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #mensajePozo; visible: false">
     </a-gltf-model>
 
     <!-- MENSAJE FLOTANTE -->
     <a-text id="mensajePozo"
-        value="静かな心は水のよう&#10;Shizukana kokoro wa mizu no you&#10;&#10;A calm heart is like water"
+        value="静かな心は水のよう;Shizukana kokoro wa mizu no you/ A calm heart is like water"
         position="34 6 -37.5"
         rotation="0 -70 0"
         anchor="center"
