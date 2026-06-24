@@ -450,55 +450,34 @@ AFRAME.registerComponent('raycaster-sound', {
 
 </a-entity>
 	  <!-- 🔮 PORTAL DE VUELTA -->
-<!-- ⛩️ TORII AAA PORTAL (JAPAN → MAIN) -->
-<a-entity id="portal_torii_aaa"
-          class="clickable"
-          position="45 1.2 19"
-          rotation="0 90 0"
-          scale="1.3 1.3 1.3"
-          portal-aaa="target: #world_1; radius: 2.2"
-          portal-energy>
+
+	<a-entity id="portal_torii_aaa" class="clickable" position="-40.33556 0.20124 2.22278" rotation="0 90 0" scale="0.75 0.75 0.75" portal-aaa="target: #world_1" portal-energy="">
 
   <!-- ===================== -->
   <!-- 🏯 ESTRUCTURA TORII -->
   <!-- ===================== -->
 
   <!-- pilares -->
-  <a-box position="-0.9 1 0"
-         width="0.25" height="3" depth="0.25"
-         color="#b30000"></a-box>
+  <a-box position="-0.9 1 0" width="0.25" height="3" depth="0.25" color="#b30000"></a-box>
 
-  <a-box position="0.9 1 0"
-         width="0.25" height="3" depth="0.25"
-         color="#b30000"></a-box>
+  <a-box position="0.9 1 0" width="0.25" height="3" depth="0.25" color="#b30000"></a-box>
 
   <!-- travesaño inferior -->
-  <a-box position="0 2.1 0"
-         width="2.2" height="0.25" depth="0.25"
-         color="#7a0000"></a-box>
+  <a-box position="0 2.1 0" width="2.2" height="0.25" depth="0.25" color="#7a0000"></a-box>
 
   <!-- travesaño superior -->
-  <a-box position="0 2.6 0"
-         width="2.8" height="0.25" depth="0.25"
-         color="#ff2a2a"></a-box>
+  <a-box position="0 2.6 0" width="2.8" height="0.25" depth="0.25" color="#ff2a2a"></a-box>
 
   <!-- ===================== -->
   <!-- 🌸 ENERGÍA / VIDA -->
   <!-- ===================== -->
 
   <!-- núcleo energético -->
-  <a-sphere radius="0.4"
-            position="0 1.8 0"
-            material="color: #ff3df2; emissive: #ff3df2; emissiveIntensity: 2; opacity: 0.8"
-            animation="property: scale; to: 1.4 1.4 1.4; dir: alternate; loop: true; dur: 900">
+  <a-sphere radius="0.4" position="0 1.8 0" material="opacity: 0.8; color: #ff3df2; emissive: #ff3df2; emissiveIntensity: 2" animation="dir: alternate; dur: 900; loop: true; property: scale; to: 1.4 1.4 1.4">
   </a-sphere>
 
   <!-- anillo energético -->
-  <a-torus radius="1.2"
-           radius-tubular="0.05"
-           rotation="90 0 0"
-           material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 1.5"
-           animation="property: rotation; to: 90 360 0; loop: true; dur: 4000">
+  <a-torus radius="1.2" radius-tubular="0.05" rotation="90 133.7287928387527 0" material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 1.5" animation="dur: 4000; loop: true; property: rotation; to: 90 360 0">
   </a-torus>
 
   <!-- ===================== -->
@@ -507,20 +486,11 @@ AFRAME.registerComponent('raycaster-sound', {
 
   <a-entity id="sakura_particles">
 
-    <a-plane position="0 3 0"
-             width="0.2" height="0.2"
-             material="color: #ffb7c5; opacity: 0.8; transparent: true"
-             animation="property: position; to: 2 -2 0; dur: 5000; loop: true"></a-plane>
+    <a-plane position="1.6294058844012307 -1.0735147110030763 0" width="0.2" height="0.2" material="opacity: 0.8; transparent: true; color: #ffb7c5" animation="dur: 5000; loop: true; property: position; to: 2 -2 0"></a-plane>
 
-    <a-plane position="1 3 0.5"
-             width="0.15" height="0.15"
-             material="color: #ffd1dc; opacity: 0.7; transparent: true"
-             animation="property: position; to: -1 -3 0; dur: 6500; loop: true"></a-plane>
+    <a-plane position="0.7249755934316272 2.1749267802948817 0.4312438983579068" width="0.15" height="0.15" material="opacity: 0.7; transparent: true; color: #ffd1dc" animation="dur: 6500; loop: true; property: position; to: -1 -3 0"></a-plane>
 
-    <a-plane position="-1 3 -0.5"
-             width="0.18" height="0.18"
-             material="color: #ff9fb0; opacity: 0.6; transparent: true"
-             animation="property: position; to: 1 -3 0; dur: 5500; loop: true"></a-plane>
+    <a-plane position="0.6830767312741259 -2.0492301938223783 -0.07923081718146852" width="0.18" height="0.18" material="opacity: 0.6; transparent: true; color: #ff9fb0" animation="dur: 5500; loop: true; property: position; to: 1 -3 0"></a-plane>
 
   </a-entity>
 
@@ -528,21 +498,16 @@ AFRAME.registerComponent('raycaster-sound', {
   <!-- 🔊 SONIDO PORTAL -->
   <!-- ===================== -->
 
-  <a-sound src="portal_whoosh.mp3"
-           autoplay="false"
-           volume="1"
-           position="0 1 0"></a-sound>
+  <a-sound src="portal_whoosh.mp3" autoplay="false" volume="1" position="0 1 0"></a-sound>
 
   <!-- ===================== -->
   <!-- 🌫️ NIEBLA INTERNA -->
   <!-- ===================== -->
 
-  <a-entity light="type: point; color: #ff66cc; intensity: 2; distance: 6"
-            position="0 2 0">
+  <a-entity light="color: #ff66cc; distance: 6; intensity: 2; type: point" position="0 2 0">
   </a-entity>
 
 </a-entity>
-	
 </a-scene>
 
 </body>
