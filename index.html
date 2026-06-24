@@ -6,7 +6,6 @@
   <script src="https://unpkg.com/aframe-event-set-component@5.x.x/dist/aframe-event-set-component.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script> 
   <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
- 
 </head>
 
 <body>
@@ -18,52 +17,24 @@
 ========================= */
 
 const spawnPoints = {
-
-  "#world_1": {
-    x: 0,
-    y: 0,
-    z: 0,
-    rotY: 0
-  },
-
-  "#world_2": {
-    x: 0,
-    y: 0,
-    z: 0,
-    rotY: 180
-  },
-
-	"#world_3": {
-  x: 0,
-  y: 2,
-  z: 5,
-  rotY: 180
-}
-	
+  "#world_1": { x: 0, y: 0, z: 0, rotY: 0 },
+  "#world_2": { x: 0, y: 0, z: 0, rotY: 180 },
+  "#world_3": { x: 0, y: 2, z: 5, rotY: 180 }
 };
 
-	
-	function stopAllWorldMusic() {
-
+function stopAllWorldMusic() {
   ['music_world1', 'music_world2', 'music_world3'].forEach(id => {
-
     const soundEntity = document.querySelector('#' + id);
-
-    if (
-      soundEntity &&
-      soundEntity.components.sound
-    ) {
+    if (soundEntity && soundEntity.components.sound) {
       soundEntity.components.sound.stopSound();
     }
-
   });
-
 }
+
 /* =========================
    🌌 CAMBIO DE MUNDO
 ========================= */
 function goWorld(id) {
-
   stopAllWorldMusic();
 
   document.querySelectorAll('[data-world]').forEach(world => {
@@ -71,47 +42,48 @@ function goWorld(id) {
   });
 
   const target = document.querySelector(id);
-
   if (target) {
     target.setAttribute('visible', true);
   }
 
   const rig = document.querySelector('#playerRig');
-
   if (rig && spawnPoints[id]) {
-
     const p = spawnPoints[id];
-
     rig.object3D.position.set(p.x, p.y, p.z);
-
-    rig.setAttribute(
-      'rotation',
-      `0 ${p.rotY} 0`
-    );
+    rig.setAttribute('rotation', `0 ${p.rotY} 0`);
   }
 
   let musicId = null;
-
   if (id === '#world_1') musicId = '#music_world1';
   if (id === '#world_2') musicId = '#music_world2';
   if (id === '#world_3') musicId = '#music_world3';
 
   const music = document.querySelector(musicId);
-
   if (music && music.components.sound) {
     music.components.sound.playSound();
   }
 }
-	
-	
 
-	
+/* =========================
+   🔊 RAYCASTER-SOUND
+   Reproduce el sonido del modelo al hacer clic con el raycaster
+========================= */
+AFRAME.registerComponent('raycaster-sound', {
+  init: function () {
+    this.el.addEventListener('click', () => {
+      const soundComp = this.el.components.sound;
+      if (soundComp) {
+        soundComp.stopSound();
+        soundComp.playSound();
+      }
+    });
+  }
+});
+
 /* =========================
    🔮 PORTAL AAA
 ========================= */
-
 AFRAME.registerComponent('portal-aaa', {
-
   schema: {
     target: {type: 'string'},
     radius: {type: 'number', default: 2.2},
@@ -119,14 +91,11 @@ AFRAME.registerComponent('portal-aaa', {
   },
 
   init: function () {
-
     this.player = document.querySelector('#playerRig');
     this.lastTeleport = 0;
-
   },
 
   tick: function () {
-
     if (!this.player) return;
 
     const playerPos = new THREE.Vector3();
@@ -137,58 +106,36 @@ AFRAME.registerComponent('portal-aaa', {
 
     const distance = playerPos.distanceTo(portalPos);
 
-    if (
-      distance < this.data.radius &&
-      Date.now() - this.lastTeleport > this.data.cooldown
-    ) {
-
+    if (distance < this.data.radius && Date.now() - this.lastTeleport > this.data.cooldown) {
       this.lastTeleport = Date.now();
       this.teleport();
-
     }
   },
 
   teleport: function () {
-
     const target = this.data.target;
 
     let fade = document.querySelector('#fade');
 
     if (!fade) {
-
       fade = document.createElement('a-plane');
-
       fade.setAttribute('id', 'fade');
       fade.setAttribute('position', '0 0 -0.5');
       fade.setAttribute('width', '5');
       fade.setAttribute('height', '5');
-      fade.setAttribute(
-        'material',
-        'color:black; opacity:0'
-      );
+      fade.setAttribute('material', 'color:black; opacity:0');
 
       const camera = document.querySelector('[camera]');
-
       if (camera) {
         camera.appendChild(fade);
       }
-
     }
 
-    fade.setAttribute(
-      'animation__fadein',
-      'property: material.opacity; to:1; dur:250'
-    );
+    fade.setAttribute('animation__fadein', 'property: material.opacity; to:1; dur:250');
 
     setTimeout(() => {
-
       goWorld(target);
-
-      fade.setAttribute(
-        'animation__fadeout',
-        'property: material.opacity; to:0; dur:500'
-      );
-
+      fade.setAttribute('animation__fadeout', 'property: material.opacity; to:0; dur:500');
     }, 250);
   }
 });
@@ -196,41 +143,81 @@ AFRAME.registerComponent('portal-aaa', {
 /* =========================
    🌀 PORTAL ENERGY
 ========================= */
-
 AFRAME.registerComponent('portal-energy', {
-
   tick: function () {
-
     const time = Date.now() * 0.002;
-
-    const scale =
-      1 + Math.sin(time) * 0.08;
-
-    const rotation =
-      Date.now() * 0.03;
-
-    this.el.setAttribute(
-      'scale',
-      `${scale} ${scale} ${scale}`
-    );
-
-    this.el.setAttribute(
-      'rotation',
-      `0 ${rotation} 0`
-    );
+    const scale = 1 + Math.sin(time) * 0.08;
+    const rotation = Date.now() * 0.03;
+    this.el.setAttribute('scale', `${scale} ${scale} ${scale}`);
+    this.el.setAttribute('rotation', `0 ${rotation} 0`);
   }
-
 });
 
 /* =========================
-   🚀 INICIO
+   🚀 INICIO — pantalla de bienvenida para desbloquear audio
 ========================= */
+document.addEventListener('DOMContentLoaded', () => {
+  const scene = document.querySelector('a-scene');
+  const overlay = document.getElementById('start-overlay');
+  const btn = document.getElementById('start-btn');
 
-window.addEventListener('load', () => {
-  goWorld('#world_1');
+  // Cargar mundo pero sin música todavía
+  scene.addEventListener('loaded', () => {
+    setTimeout(() => {
+      // Mostrar mundos pero sin sonido aún
+      document.querySelectorAll('[data-world]').forEach(w => w.setAttribute('visible', false));
+      document.querySelector('#world_1').setAttribute('visible', true);
+      const rig = document.querySelector('#playerRig');
+      if (rig) rig.object3D.position.set(0, 0, 0);
+    }, 300);
+  });
+
+  // Al pulsar el botón: ocultar overlay y arrancar música
+  btn.addEventListener('click', () => {
+    overlay.style.display = 'none';
+    // Reanudar AudioContext si el navegador lo suspendió
+    const ctx = THREE.AudioContext.getContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().then(() => playWorldMusic('#music_world1'));
+    } else {
+      playWorldMusic('#music_world1');
+    }
+  });
 });
 
+function playWorldMusic(id) {
+  const music = document.querySelector(id);
+  if (music && music.components.sound) {
+    music.components.sound.playSound();
+  }
+}
+
 </script>
+
+<!-- 🎬 PANTALLA DE INICIO -->
+<div id="start-overlay" style="
+  position: fixed; inset: 0; z-index: 9999;
+  background: #000;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px;
+  font-family: sans-serif; color: #fff;">
+  <div style="font-size: 2rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.9;">🌌 VR World</div>
+  <div style="font-size: 0.95rem; opacity: 0.5;">Carga completada</div>
+  <button id="start-btn" style="
+    margin-top: 12px;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;">
+    ▶ ENTRAR
+  </button>
+</div>
 
 <a-scene>
 
@@ -251,14 +238,11 @@ window.addEventListener('load', () => {
   <!-- 🌍 WORLD 1 (MAIN) -->
   <a-entity id="world_1" data-world="true">
 
-    
-	  
-	  <a-sound id="music_world1"
-         src="warm-nights.mp3"
-         sound="loop: true; volume: 10">
-</a-sound>
-	  
-	  
+    <a-sound id="music_world1"
+             src="warm-nights.mp3"
+             sound="loop: true; volume: 10">
+    </a-sound>
+
     <a-gltf-model src="backrooms_vr.glb"
                   scale="1.25 1.25 1.25"></a-gltf-model>
 
@@ -270,54 +254,51 @@ window.addEventListener('load', () => {
     <a-sky color="#b28f50"></a-sky>
 
     <!-- 🔮 PORTAL → WORLD 2 -->
-   
-	  
-	  <a-entity id="portal_world2" 
-				class="clickable" 
-				geometry="primitive: torus" 
-				material="color: #7c3cff; emissive: #aa55ff; emissiveIntensity: 2" 
-				position="-78.3741 1.5492 12.30567" 
-				scale="0.75 0.75 0.75" rotation="0 53468952506.909996 0" 
-				portal-aaa="target: #world_2" 
-				portal-energy="">
+    <a-entity id="portal_world2" 
+              class="clickable" 
+              geometry="primitive: torus" 
+              material="color: #7c3cff; emissive: #aa55ff; emissiveIntensity: 2" 
+              position="-78.3741 1.5492 12.30567" 
+              scale="0.75 0.75 0.75" rotation="0 53468952506.909996 0" 
+              portal-aaa="target: #world_2" 
+              portal-energy="">
     </a-entity>
-	  
-	   <!-- 🔮 PORTAL → WORLD 3 -->
-	 
-   <a-entity id="portal_world3" 
-			 class="clickable" 
-			 geometry="primitive: torus" 
-			 material="color: #00ff88; emissive: #00ff88; emissiveIntensity: 2" 
-			 position="-38.43431 1.31838 0.8166" 
-			 scale="0.9865896757666517 0.9865896757666517 0.9865896757666517" 
-			 rotation="0 53468914270.47 0" 
-			 portal-aaa="target: #world_3" 
-			 portal-energy="">
-</a-entity>
-  
+
+    <!-- 🔮 PORTAL → WORLD 3 -->
+    <a-entity id="portal_world3" 
+              class="clickable" 
+              geometry="primitive: torus" 
+              material="color: #00ff88; emissive: #00ff88; emissiveIntensity: 2" 
+              position="-38.43431 1.31838 0.8166" 
+              scale="0.9865896757666517 0.9865896757666517 0.9865896757666517" 
+              rotation="0 53468914270.47 0" 
+              portal-aaa="target: #world_3" 
+              portal-energy="">
+    </a-entity>
+
   </a-entity>
 
   <!-- 🌍 WORLD 2 -->
   <a-entity id="world_2" data-world="true" visible="false">
-	  
-	 <a-sound id="music_world2"
-         src="Kavinsky.mp3"
-         sound="loop: true; volume: 10">
-</a-sound>
+
+    <a-sound id="music_world2"
+             src="Kavinsky.mp3"
+             sound="loop: true; volume: 10">
+    </a-sound>
 
     <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
                   position="-5 0 2"
-				  class="clickable"
-				  sound="src: rotativo.mp3; autoplay: false; loop: false" 
-				  raycaster-sound
+                  class="clickable"
+                  sound="src: rotativo.mp3; autoplay: false; loop: false" 
+                  raycaster-sound
                   rotation="0 -90 0"></a-gltf-model>
 
     <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
 
     <a-gltf-model src="truck_opt.glb"
-				  class="clickable"
-				  sound="src: camion.mp3; autoplay: false; loop: false" 
-				  raycaster-sound
+                  class="clickable"
+                  sound="src: camion.mp3; autoplay: false; loop: false" 
+                  raycaster-sound
                   position="-29 2.3 20"
                   rotation="0 -20 0"></a-gltf-model>
 
@@ -332,444 +313,279 @@ window.addEventListener('load', () => {
                 scale="0.2 0.2 0.2"></a-cylinder>
 
     <!-- 🔮 PORTAL DE VUELTA -->
-   <a-entity id="portal_back_to_main" 
-			 class="clickable" 
-			 geometry="primitive: torus" 
-			 material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 2" 
-			 position="-20 1.9 32.7" scale="1.07 1.07 1.07" 
-			 portal-aaa="target: #world_1" 
-			 portal-energy="" 
-			 data_liveedit_tagid="0000000012D03390">
+    <a-entity id="portal_back_to_main" 
+              class="clickable" 
+              geometry="primitive: torus" 
+              material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 2" 
+              position="-20 1.9 32.7" scale="1.07 1.07 1.07" 
+              portal-aaa="target: #world_1" 
+              portal-energy="">
     </a-entity>
-	  <a-entity light="type: ambient; color: #ffffff; intensity: 3"></a-entity>
 
-<a-entity light="type: directional; position: 0 5 5; intensity: 1"></a-entity>
-
-	 
-	  
-  </a-entity>
-	
-	 <!-- 🌍 WORLD 3 -->
-	
-<a-entity id="world_3" data-world="true" visible="false">
-	
-<a-sound id="music_world3"
-         src="musica.mp3"
-         sound="loop: true; volume: 3">
-</a-sound>
-	
-      
-
-        <!--primitivas-->
-            <a-plane 
-                position="0 0 -4" 
-                scale="500 500 500" 
-                rotation="-90 0 0" 
-                width="4" 
-                height="4" 
-                color="#3B5110">
-            </a-plane>
-
-            <a-light 
-                type="ambient" 
-                color="#AFEEEE">
-            </a-light>
-
-            <a-cylinder
-                position="40 10 -5"
-                scale="0.5 21 0.5"
-                color="brown"
-               
-				 event-set__enter="_event: raycaster-intersected; _target: #flag; visible: true"
-                 event-set__leave="_event: raycaster-intersected-cleared; _target: #flag; visible: false">
-               
-           <a-box 
-    	id="flag"
-   		 src="https://i.ibb.co/LdHDh4Y9/images.png" 
-    	color="#FFFFFF" 
-    	visible="false" 
-    	position="0 0.35 8" 
-    	scale="15 0.3 -0.5" 
-    	rotation=" 0 85 0">
-		</a-box>
-            </a-cylinder>
-
-
-        <!--modelos 3d-->
-		
-		<!--Assets-->
-		
-		
-
-            <!-- =========EDIFICIOS==========  -->
-
-                <a-gltf-model id="templo" src="https://cdn.tinyglb.com/models/4a2392a6fa04477493b9015416cf0571.glb" 
-                    alt="templo" 
-                    position="0 0 -40" 
-                    scale="0.01 0.01 0.01" 
-                    rotation="0 0 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/26df246b648249448a9a85552e3e07bd.glb" 
-                    alt="puerta tori" 
-                    position="0 0 -15" 
-                    scale="14 14 14">
-
-                    <a-light type="directional"
-                        position="5 10 5"
-                        intensity="1"
-                        color="#ffffff">
-                    </a-light>
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/c728a8c818a148aeab0f867e2e917b66.glb" 
-                    alt="tienda" 
-                    position="-30 0 5" 
-                    scale="1 1 1" 
-                    rotation="0 90 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/5fb5871d0e6b46868efd2a1f92bc8704.glb" 
-                    alt="casita" 
-                    position="-30 0 -20" 
-                    scale="1.5 1.5 1.5" 
-                    rotation="0 55 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/783d20c383b14c77a3c02175dfe4d5ea.glb" 
-                    alt="cascada" 
-                    position="40 9 -28" 
-                    scale="0.1 0.1 0.1" 
-                    rotation="0 -62 0">
-                </a-gltf-model>
-                  
-            <!-- =========PAISAJE========== -->
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/262ef18899b449b798df4de8d079b5e2.glb" 
-                    alt="cielo" 
-                    position="30 0 -49" 
-                    scale="40 40 40" 
-                    rotation="0 90 0" 
-
-                    animation="
-                    property: rotation; 
-                    to: 0 360 0; 
-                    loop: true; 
-                    dur: 700000; 
-                    easing: linear">
-
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/8719c13ab9a5456c9e80ba55cc33ef31.glb" 
-                    alt="mountain" 
-                    position="100 0 -300" 
-                    scale="200 200 200" 
-                    rotation="0 -180 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/8719c13ab9a5456c9e80ba55cc33ef31.glb" 
-                    alt="mountain" 
-                    position="-100 0 -300" 
-                    scale="200 200 200" 
-                    rotation="0 180 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
-                    alt="cerezoD" 
-                    position="-20 0 -40" 
-                    scale="40 40 40"
-
-                    
-						 event-set__enter="_event: raycaster-intersected; _target: #petalos; visible: true"
-                         event-set__leave="_event: raycaster-intersected-cleared; _target: #petalos; visible: false">
-
-                </a-gltf-model>
-
-                <!-- PETALOS -->
-                <a-entity id="petalos" visible="false">
-
-                    <a-plane
-                        position="-20 8 -40"
-                        width="0.3"
-                        height="0.15"
-                        color="#ffc0cb"
-                        rotation="0 0 35"
-                        opacity="0.8"
-
-                        animation="
-                            property: position;
-                            to: -18 0 -41;
-                            dur: 5000;
-                            loop: true">
-
-                    </a-plane>
-
-                    <a-plane
-                        position="-21 9 -39"
-                        width="0.25"
-                        height="0.12"
-                        color="#ffb6c1"
-                        rotation="0 0 -20"
-                        opacity="0.7"
-
-                        animation="
-                            property: position;
-                            to: -22 0 -42;
-                            dur: 6500;
-                            loop: true">
-
-                    </a-plane>
-
-                    <a-plane
-                        position="-19 7 -41"
-                        width="0.2"
-                        height="0.1"
-                        color="#ffd1dc"
-                        rotation="0 0 60"
-                        opacity="0.6"
-
-                        animation="
-                            property: position;
-                            to: -17 0 -39;
-                            dur: 4500;
-                            loop: true">
-
-                    </a-plane>
-
-                    <a-plane
-                        position="-20 10 -40"
-                        width="0.28"
-                        height="0.14"
-                        color="#ffc0cb"
-                        rotation="0 0 -45"
-                        opacity="0.75"
-
-                        animation="
-                            property: position;
-                            to: -23 0 -43;
-                            dur: 7000;
-                            loop: true">
-                    </a-plane>
-
-                </a-entity>
-
-                <a-gltf-model src="cerezo.glb" 
-                    alt="cerezoI" 
-                    position="20 0 -50" 
-                    scale="40 40 40">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
-                    alt="cerezoI2" 
-                    position="30 0 -49" 
-                    scale="40 40 40" 
-                    rotation="0 90 0">
-                </a-gltf-model>
-                           
-	
-            <!-- =========PLANTAS========== -->
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/3751678cfd104f9887a0879e7d3f6bb2.glb" 
-                    alt="floresI" 
-                    position="-20 0 -40" 
-                    scale="2 2 2">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/3751678cfd104f9887a0879e7d3f6bb2.glb" 
-                    alt="floresD" 
-                    position="20 0 -50" 
-                    scale="2 2 2" 
-                    rotation="0 90 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/417f89856d584515bc1882e1a658c3b2.glb" 
-                    alt="grassI" 
-                    position="-4 0 -28" 
-                    scale="0.15 0.15 0.15">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/417f89856d584515bc1882e1a658c3b2.glb" 
-                    alt="grassD" 
-                    position="4 0 -28" 
-                    scale="0.15 0.15 0.15" 
-                    rotation="0 180 0">
-                </a-gltf-model>
-                
-            <!-- =========DECORACION========== -->
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/290528bf459c4c4abb680d2d6593fb88.glb" 
-                    alt="buda" 
-                    position="23 0 -45" 
-                    scale="0.5 0.5 0.5" 
-                    rotation="0 -15 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/f611c22f5f0a48aa99333f388df8b12a.glb" 
-                    alt="farolillosD" 
-                    position="4 0 -10" 
-                    scale="1.5 1.5 1.5" 
-                    rotation="0 -90 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/f611c22f5f0a48aa99333f388df8b12a.glb" 
-                    alt="farolillosI" 
-                    position="-4 0 -10" 
-                    scale="1.5 1.5 1.5" 
-                    rotation="0 -90 0">
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/b9e81d602f284278b65ff93dd703aecb.glb" 
-                    alt="farol1" 
-                    position="18 0 -48" 
-                    scale="0.02 0.02 0.02">
-
-                    <a-light type="point"
-                        position="18 0 -45"
-                        color="#ffb347"
-                        intensity="5"
-                        distance="15">
-                    </a-light>
-                </a-gltf-model>
-
-                 <a-gltf-model src="https://cdn.tinyglb.com/models/b9e81d602f284278b65ff93dd703aecb.glb" 
-                    alt="farol2" 
-                    position="30 0 -45" 
-                    scale="0.02 0.02 0.02">
-
-                    <a-light type="point"
-                        position="18 0 -45"
-                        color="#ffb347"
-                        intensity="5"
-                        distance="15">
-                    </a-light>
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/b9e81d602f284278b65ff93dd703aecb.glb" 
-                    alt="farol3" 
-                    position="-15 0 -35" 
-                    scale="0.02 0.02 0.02">
-
-                    <a-light type="point"
-                        position="18 0 -45"
-                        color="#ffb347"
-                        intensity="5"
-                        distance="15">
-                    </a-light>
-                </a-gltf-model>
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/54b114fb59464f7a9f1dcbe083fbbd0e.glb" 
-                    alt="pozo" 
-                    position="38 0 -37.5" 
-                    scale="3 3 3" 
-                    rotation="0 100 0"
-
-                    
-					event-set__enter="_event: raycaster-intersected; _target: #mensajePozo; visible: true"
-                    event-set__leave="_event: raycaster-intersected-cleared; _target: #mensajePozo; visible: false">
-
-                </a-gltf-model>
-
-            <!-- MENSAJE FLOTANTE -->
-                <a-text                  
-                    id="mensajePozo"
-
-                    value="静かな心は水のよう\nShizukana kokoro wa mizu no you\n\nA calm heart is like water"
-                    position="34 6 -37.5"
-                    rotation="0 -70 0"
-                    anchor="center"
-                    color="#ffd7f1"
-                    width="20"
-                    opacity="0.85"
-                    visible="false"
-                    shader="msdf"
-
-                    animation="
-                        property: position;
-                        dir: alternate;
-                        dur: 2000;
-                        loop: true;
-                        to: 34 6.5 -37.5">
-
-                </a-text>
-
-                <a-light
-                    type="point"
-                    position="38 5 -37.5"
-                    color="#ffb7e8"
-                    intensity="1"
-                    distance="10">
-                </a-light>
-
-
-
-                <a-gltf-model src="https://cdn.tinyglb.com/models/a66f326b06a84414b377269da9d6d355.glb" 
-                    alt="samurai" 
-                    position="-20 6.7 -28" 
-                    scale="0.004 0.004 0.004" 
-                    rotation="0 -45 0">
-                </a-gltf-model>
-
-	
-	
-  <!-- 🔮 PORTAL DE VUELTA -->
-
-	<a-entity id="portal_torii_aaa" class="clickable" position="13.85591 0.20124 12.50308" rotation="0 90 0" scale="3 3 3" portal-aaa="target: #world_1" portal-energy="">
-
-  <!-- ===================== -->
-  <!-- 🏯 ESTRUCTURA TORII -->
-  <!-- ===================== -->
-
-  <!-- pilares -->
-  <a-box position="-0.9 1 0" width="0.25" height="3" depth="0.25" color="#b30000"></a-box>
-
-  <a-box position="0.9 1 0" width="0.25" height="3" depth="0.25" color="#b30000"></a-box>
-
-  <!-- travesaño inferior -->
-  <a-box position="0 2.1 0" width="2.2" height="0.25" depth="0.25" color="#7a0000"></a-box>
-
-  <!-- travesaño superior -->
-  <a-box position="0 2.6 0" width="2.8" height="0.25" depth="0.25" color="#ff2a2a"></a-box>
-
-  <!-- ===================== -->
-  <!-- 🌸 ENERGÍA / VIDA -->
-  <!-- ===================== -->
-
-  <!-- núcleo energético -->
-  <a-sphere radius="0.4" position="0 1.8 0" material="opacity: 0.8; color: #ff3df2; emissive: #ff3df2; emissiveIntensity: 2" animation="dir: alternate; dur: 900; loop: true; property: scale; to: 1.4 1.4 1.4">
-  </a-sphere>
-
-  <!-- anillo energético -->
-  <a-torus radius="1.2" radius-tubular="0.05" rotation="90 203.02898370398202 0" material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 1.5" animation="dur: 4000; loop: true; property: rotation; to: 90 360 0">
-  </a-torus>
-
-  <!-- ===================== -->
-  <!-- 🌸 PARTÍCULAS SAKURA -->
-  <!-- ===================== -->
-
-  <a-entity id="sakura_particles">
-
-    <a-plane position="1.9248247170005428 -1.8120617925013571 0" width="0.2" height="0.2" material="opacity: 0.8; transparent: true; color: #ffb7c5" animation="dur: 5000; loop: true; property: position; to: 2 -2 0"></a-plane>
-
-    <a-plane position="-0.3998215964936405 -1.199464789480922 0.15004460087658986" width="0.15" height="0.15" material="opacity: 0.7; transparent: true; color: #ffd1dc" animation="dur: 6500; loop: true; property: position; to: -1 -3 0"></a-plane>
-
-    <a-plane position="0.9119888064191639 -2.735966419257492 -0.02200279839520901" width="0.18" height="0.18" material="opacity: 0.6; transparent: true; color: #ff9fb0" animation="dur: 5500; loop: true; property: position; to: 1 -3 0"></a-plane>
+    <a-entity light="type: ambient; color: #ffffff; intensity: 3"></a-entity>
+    <a-entity light="type: directional; position: 0 5 5; intensity: 1"></a-entity>
 
   </a-entity>
 
-  <!-- ===================== -->
-  <!-- 🔊 SONIDO PORTAL -->
-  <!-- ===================== -->
+  <!-- 🌍 WORLD 3 -->
+  <a-entity id="world_3" data-world="true" visible="false">
 
-  <a-sound src="portal_whoosh.mp3" autoplay="false" volume="1" position="0 1 0"></a-sound>
+    <a-sound id="music_world3"
+             src="musica.mp3"
+             sound="loop: true; volume: 3">
+    </a-sound>
 
-  <!-- ===================== -->
-  <!-- 🌫️ NIEBLA INTERNA -->
-  <!-- ===================== -->
+    <!-- primitivas -->
+    <a-plane 
+        position="0 0 -4" 
+        scale="500 500 500" 
+        rotation="-90 0 0" 
+        width="4" 
+        height="4" 
+        color="#3B5110">
+    </a-plane>
 
-  <a-entity light="color: #ff66cc; distance: 6; intensity: 2; type: point" position="0 2 0">
+    <a-light type="ambient" color="#AFEEEE"></a-light>
+
+    <a-cylinder
+        position="40 10 -5"
+        scale="0.5 21 0.5"
+        color="brown"
+        event-set__enter="_event: raycaster-intersected; _target: #flag; visible: true"
+        event-set__leave="_event: raycaster-intersected-cleared; _target: #flag; visible: false">
+
+      <a-box 
+          id="flag"
+          src="https://i.ibb.co/LdHDh4Y9/images.png" 
+          color="#FFFFFF" 
+          visible="false" 
+          position="0 0.35 8" 
+          scale="15 0.3 -0.5" 
+          rotation="0 85 0">
+      </a-box>
+    </a-cylinder>
+
+    <!-- =========EDIFICIOS========== -->
+
+    <a-gltf-model id="templo" src="https://cdn.tinyglb.com/models/4a2392a6fa04477493b9015416cf0571.glb" 
+        position="0 0 -40" 
+        scale="0.01 0.01 0.01" 
+        rotation="0 0 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/26df246b648249448a9a85552e3e07bd.glb" 
+        position="0 0 -15" 
+        scale="14 14 14">
+      <a-light type="directional" position="5 10 5" intensity="1" color="#ffffff"></a-light>
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/c728a8c818a148aeab0f867e2e917b66.glb" 
+        position="-30 0 5" 
+        scale="1 1 1" 
+        rotation="0 90 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/5fb5871d0e6b46868efd2a1f92bc8704.glb" 
+        position="-30 0 -20" 
+        scale="1.5 1.5 1.5" 
+        rotation="0 55 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/783d20c383b14c77a3c02175dfe4d5ea.glb" 
+        position="40 9 -28" 
+        scale="0.1 0.1 0.1" 
+        rotation="0 -62 0">
+    </a-gltf-model>
+
+    <!-- =========PAISAJE========== -->
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/262ef18899b449b798df4de8d079b5e2.glb" 
+        position="30 0 -49" 
+        scale="40 40 40" 
+        rotation="0 90 0"
+        animation="property: rotation; to: 0 360 0; loop: true; dur: 700000; easing: linear">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/8719c13ab9a5456c9e80ba55cc33ef31.glb" 
+        position="100 0 -300" 
+        scale="200 200 200" 
+        rotation="0 -180 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/8719c13ab9a5456c9e80ba55cc33ef31.glb" 
+        position="-100 0 -300" 
+        scale="200 200 200" 
+        rotation="0 180 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
+        position="-20 0 -40" 
+        scale="40 40 40"
+        event-set__enter="_event: raycaster-intersected; _target: #petalos; visible: true"
+        event-set__leave="_event: raycaster-intersected-cleared; _target: #petalos; visible: false">
+    </a-gltf-model>
+
+    <!-- PETALOS -->
+    <a-entity id="petalos" visible="false">
+
+      <a-plane position="-20 8 -40" width="0.3" height="0.15" color="#ffc0cb"
+               rotation="0 0 35" opacity="0.8"
+               animation="property: position; to: -18 0 -41; dur: 5000; loop: true">
+      </a-plane>
+
+      <a-plane position="-21 9 -39" width="0.25" height="0.12" color="#ffb6c1"
+               rotation="0 0 -20" opacity="0.7"
+               animation="property: position; to: -22 0 -42; dur: 6500; loop: true">
+      </a-plane>
+
+      <a-plane position="-19 7 -41" width="0.2" height="0.1" color="#ffd1dc"
+               rotation="0 0 60" opacity="0.6"
+               animation="property: position; to: -17 0 -39; dur: 4500; loop: true">
+      </a-plane>
+
+      <a-plane position="-20 10 -40" width="0.28" height="0.14" color="#ffc0cb"
+               rotation="0 0 -45" opacity="0.75"
+               animation="property: position; to: -23 0 -43; dur: 7000; loop: true">
+      </a-plane>
+
+    </a-entity>
+
+    <a-gltf-model src="cerezo.glb" position="20 0 -50" scale="40 40 40"></a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
+        position="30 0 -49" 
+        scale="40 40 40" 
+        rotation="0 90 0">
+    </a-gltf-model>
+
+    <!-- =========PLANTAS========== -->
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/3751678cfd104f9887a0879e7d3f6bb2.glb" 
+        position="-20 0 -40" scale="2 2 2">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/3751678cfd104f9887a0879e7d3f6bb2.glb" 
+        position="20 0 -50" scale="2 2 2" rotation="0 90 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/417f89856d584515bc1882e1a658c3b2.glb" 
+        position="-4 0 -28" scale="0.15 0.15 0.15">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/417f89856d584515bc1882e1a658c3b2.glb" 
+        position="4 0 -28" scale="0.15 0.15 0.15" rotation="0 180 0">
+    </a-gltf-model>
+
+    <!-- =========DECORACION========== -->
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/290528bf459c4c4abb680d2d6593fb88.glb" 
+        position="23 0 -45" scale="0.5 0.5 0.5" rotation="0 -15 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/f611c22f5f0a48aa99333f388df8b12a.glb" 
+        position="4 0 -10" scale="1.5 1.5 1.5" rotation="0 -90 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/f611c22f5f0a48aa99333f388df8b12a.glb" 
+        position="-4 0 -10" scale="1.5 1.5 1.5" rotation="0 -90 0">
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/b9e81d602f284278b65ff93dd703aecb.glb" 
+        position="18 0 -48" scale="0.02 0.02 0.02">
+      <a-light type="point" position="18 0 -45" color="#ffb347" intensity="5" distance="15"></a-light>
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/b9e81d602f284278b65ff93dd703aecb.glb" 
+        position="30 0 -45" scale="0.02 0.02 0.02">
+      <a-light type="point" position="18 0 -45" color="#ffb347" intensity="5" distance="15"></a-light>
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/b9e81d602f284278b65ff93dd703aecb.glb" 
+        position="-15 0 -35" scale="0.02 0.02 0.02">
+      <a-light type="point" position="18 0 -45" color="#ffb347" intensity="5" distance="15"></a-light>
+    </a-gltf-model>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/54b114fb59464f7a9f1dcbe083fbbd0e.glb" 
+        position="38 0 -37.5" scale="3 3 3" rotation="0 100 0"
+        event-set__enter="_event: raycaster-intersected; _target: #mensajePozo; visible: true"
+        event-set__leave="_event: raycaster-intersected-cleared; _target: #mensajePozo; visible: false">
+    </a-gltf-model>
+
+    <!-- MENSAJE FLOTANTE -->
+    <a-text id="mensajePozo"
+        value="静かな心は水のよう&#10;Shizukana kokoro wa mizu no you&#10;&#10;A calm heart is like water"
+        position="34 6 -37.5"
+        rotation="0 -70 0"
+        anchor="center"
+        color="#ffd7f1"
+        width="20"
+        opacity="0.85"
+        visible="false"
+        shader="msdf"
+        animation="property: position; dir: alternate; dur: 2000; loop: true; to: 34 6.5 -37.5">
+    </a-text>
+
+    <a-light type="point" position="38 5 -37.5" color="#ffb7e8" intensity="1" distance="10"></a-light>
+
+    <a-gltf-model src="https://cdn.tinyglb.com/models/a66f326b06a84414b377269da9d6d355.glb" 
+        position="-20 6.7 -28" scale="0.004 0.004 0.004" rotation="0 -45 0">
+    </a-gltf-model>
+
+    <!-- 🔮 PORTAL DE VUELTA (TORII) -->
+    <a-entity id="portal_torii_aaa" class="clickable" 
+              position="13.85591 0.20124 12.50308" 
+              rotation="0 90 0" scale="3 3 3" 
+              portal-aaa="target: #world_1" 
+              portal-energy="">
+
+      <!-- pilares -->
+      <a-box position="-0.9 1 0" width="0.25" height="3" depth="0.25" color="#b30000"></a-box>
+      <a-box position="0.9 1 0" width="0.25" height="3" depth="0.25" color="#b30000"></a-box>
+
+      <!-- travesaño inferior -->
+      <a-box position="0 2.1 0" width="2.2" height="0.25" depth="0.25" color="#7a0000"></a-box>
+
+      <!-- travesaño superior -->
+      <a-box position="0 2.6 0" width="2.8" height="0.25" depth="0.25" color="#ff2a2a"></a-box>
+
+      <!-- núcleo energético -->
+      <a-sphere radius="0.4" position="0 1.8 0" 
+                material="opacity: 0.8; color: #ff3df2; emissive: #ff3df2; emissiveIntensity: 2"
+                animation="dir: alternate; dur: 900; loop: true; property: scale; to: 1.4 1.4 1.4">
+      </a-sphere>
+
+      <!-- anillo energético -->
+      <a-torus radius="1.2" radius-tubular="0.05" rotation="90 203.02898370398202 0" 
+               material="color: #00ffff; emissive: #00ffff; emissiveIntensity: 1.5"
+               animation="dur: 4000; loop: true; property: rotation; to: 90 360 0">
+      </a-torus>
+
+      <!-- partículas sakura -->
+      <a-entity id="sakura_particles">
+        <a-plane position="1.92 -1.81 0" width="0.2" height="0.2" 
+                 material="opacity: 0.8; transparent: true; color: #ffb7c5"
+                 animation="dur: 5000; loop: true; property: position; to: 2 -2 0">
+        </a-plane>
+        <a-plane position="-0.4 -1.2 0.15" width="0.15" height="0.15" 
+                 material="opacity: 0.7; transparent: true; color: #ffd1dc"
+                 animation="dur: 6500; loop: true; property: position; to: -1 -3 0">
+        </a-plane>
+        <a-plane position="0.91 -2.74 -0.02" width="0.18" height="0.18" 
+                 material="opacity: 0.6; transparent: true; color: #ff9fb0"
+                 animation="dur: 5500; loop: true; property: position; to: 1 -3 0">
+        </a-plane>
+      </a-entity>
+
+      <!-- sonido portal -->
+      <a-sound src="portal_whoosh.mp3" autoplay="false" volume="1" position="0 1 0"></a-sound>
+
+      <!-- luz interna -->
+      <a-entity light="color: #ff66cc; distance: 6; intensity: 2; type: point" position="0 2 0"></a-entity>
+
+    </a-entity>
+
   </a-entity>
-</a-entity>
-	</a-entity>
+
 </a-scene>
 
 </body>
