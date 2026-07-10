@@ -19,11 +19,12 @@
 const spawnPoints = {
   "#world_1": { x: 0, y: 0, z: 0, rotY: 0 },
   "#world_2": { x: 0, y: 0, z: 0, rotY: 180 },
-  "#world_3": { x: 0, y: 2, z: 5, rotY: 180 }
+  "#world_3": { x: 0, y: 2, z: 5, rotY: 180 },
+  "#world_4": { x: 0, y: 0, z: 0, rotY: 180 }
 };
 
 function stopAllWorldMusic() {
-  ['music_world1', 'music_world2', 'music_world3'].forEach(id => {
+  ['music_world1', 'music_world2', 'music_world3', 'music_world4'].forEach(id => {
     const soundEntity = document.querySelector('#' + id);
     if (soundEntity && soundEntity.components.sound) {
       soundEntity.components.sound.stopSound();
@@ -57,6 +58,7 @@ function goWorld(id) {
   if (id === '#world_1') musicId = '#music_world1';
   if (id === '#world_2') musicId = '#music_world2';
   if (id === '#world_3') musicId = '#music_world3';
+  if (id === '#world_4') musicId = '#music_world4';
 
   const music = document.querySelector(musicId);
   if (music && music.components.sound) {
@@ -240,7 +242,7 @@ function playWorldMusic(id) {
 
     <a-sound id="music_world1"
              src="warm-nights.mp3"
-             sound="loop: true; volume: 8">
+             sound="loop: true; volume: 10">
     </a-sound>
 
     <a-gltf-model src="backrooms_vr.glb"
@@ -276,28 +278,40 @@ function playWorldMusic(id) {
               portal-energy="">
     </a-entity>
 
+    <!-- 🔮 PORTAL → WORLD 4 -->
+    <a-entity id="portal_world4" 
+              class="clickable" 
+              geometry="primitive: torus" 
+              material="color: #00ff88; emissive: #00ff88; emissiveIntensity: 2" 
+              position="-54.10852 1.5029 -3.96282" 
+              scale="1.0791629953283008 1.0791629953283008 1.0791629953283008" 
+              rotation="0 53508625171.5 0" 
+              portal-aaa="target: #world_4" 
+              portal-energy="">
+    </a-entity>
   </a-entity>
+
 
   <!-- 🌍 WORLD 2 -->
   <a-entity id="world_2" data-world="true" visible="false">
 
     <a-sound id="music_world2"
              src="Kavinsky.mp3"
-             sound="loop: true; volume: 7">
+             sound="loop: true; volume: 10">
     </a-sound>
 
     <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
                   position="-5 0 2"
                   class="clickable"
-                  sound="src: rotativo.mp3; autoplay: false; loop: false; volume: 5" 
+                  sound="src: rotativo.mp3; autoplay: false; loop: false" 
                   raycaster-sound
                   rotation="0 -90 0"></a-gltf-model>
 
     <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
 
     <a-gltf-model src="truck_opt.glb"
-                  class="clickable"    
-                  sound="src: camion.mp3; autoplay: false; loop: false; volume: 5"
+                  class="clickable"
+                  sound="src: camion.mp3; autoplay: false; loop: false" 
                   raycaster-sound
                   position="-29 2.3 20"
                   rotation="0 -20 0"></a-gltf-model>
@@ -349,7 +363,6 @@ function playWorldMusic(id) {
 
     <a-cylinder
         position="40 10 -5"
-        class="clickable"
         scale="0.5 21 0.5"
         color="brown"
         event-set__enter="_event: raycaster-intersected; _target: #flag; visible: true"
@@ -421,7 +434,6 @@ function playWorldMusic(id) {
 
     <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
         position="-20 0 -40" 
-        class="clickable"
         scale="40 40 40"
         event-set__enter="_event: raycaster-intersected; _target: #petalos; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #petalos; visible: false">
@@ -509,14 +521,13 @@ function playWorldMusic(id) {
 
     <a-gltf-model src="https://cdn.tinyglb.com/models/54b114fb59464f7a9f1dcbe083fbbd0e.glb" 
         position="38 0 -37.5" scale="3 3 3" rotation="0 100 0"
-        class="clickable"
         event-set__enter="_event: raycaster-intersected; _target: #mensajePozo; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #mensajePozo; visible: false">
     </a-gltf-model>
 
     <!-- MENSAJE FLOTANTE -->
     <a-text id="mensajePozo"
-        value="静かな心は水のよう;Shizukana kokoro wa mizu no you/ A calm heart is like water"
+        value="静かな心は水のよう&#10;Shizukana kokoro wa mizu no you&#10;&#10;A calm heart is like water"
         position="34 6 -37.5"
         rotation="0 -70 0"
         anchor="center"
@@ -537,7 +548,7 @@ function playWorldMusic(id) {
     <!-- 🔮 PORTAL DE VUELTA (TORII) -->
     <a-entity id="portal_torii_aaa" class="clickable" 
               position="13.85591 0.20124 12.50308" 
-              rotation="0 90 0" scale="3.000 3.000 3.000" 
+              rotation="0 90 0" scale="1.80 1.80 1.803" 
               portal-aaa="target: #world_1" 
               portal-energy="">
 
@@ -589,7 +600,120 @@ function playWorldMusic(id) {
 
   </a-entity>
 
+  <!-- 🌍 WORLD 4 -->
+  <!-- Recentrado: todos los elementos internos desplazados por el inverso
+       de la posición original del stranger_things_room.glb
+       (-54.662, -0.344, -6.106) → offset aplicado: +54.662, +0.344, +6.106 -->
+  <a-entity id="world_4" data-world="true" visible="false">
+
+    <a-sound id="music_world4"
+             src="Neverending Story - Limahl - Extended.mp3"
+             sound="loop: true; volume: 10">
+    </a-sound>
+
+    <!-- modelo centrado en el origen -->
+    <a-gltf-model src="stranger_things_room.glb" position="0 0 0" scale="2 2 2"></a-gltf-model>
+
+    <a-gltf-model src="sky_opt.glb" gltf-model="sky_opt.glb" 
+                  position="-4.20978 1.40285 -2.76337" 
+                  rotation="0 0 0" 
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 100000; easing: linear">
+    </a-gltf-model>
+
+    <a-gltf-model src="Sol_opt.glb" gltf-model="sun_opt.glb" 
+                  position="-7.93262 0.344 19.10341" 
+                  scale="0.5 0.5 0.5" 
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 100000; easing: linear">
+    </a-gltf-model>
+
+    <!-- 🩸 PORTAL DEL REVÉS (UPSIDE DOWN GATE) -->
+    <a-entity id="portal_upsidedown_aaa" class="clickable" 
+              position="3.207 0.579 -2.678" 
+              rotation="0 90 0" scale="0.75 0.75 0.75" 
+              portal-aaa="target: #world_1" 
+              portal-energy="">
+
+      <!-- estructura orgánica: en vez de pilares rectos, troncos retorcidos -->
+      <a-cylinder position="-0.9 1 0" radius="0.15" height="3" 
+                  material="color: #1a0505; roughness: 1" 
+                  rotation="0 0 8"></a-cylinder>
+      <a-cylinder position="0.9 1 0" radius="0.15" height="3" 
+                  material="color: #1a0505; roughness: 1" 
+                  rotation="0 0 -8"></a-cylinder>
+
+      <!-- travesaño inferior: raíz gruesa -->
+      <a-box position="0 2.1 0" width="2.2" height="0.3" depth="0.3" 
+             material="color: #120303; roughness: 1"></a-box>
+
+      <!-- travesaño superior: fisura luminosa -->
+      <a-box position="0 2.6 0" width="2.8" height="0.2" depth="0.2" 
+             material="color: #3a0000; emissive: #b30000; emissiveIntensity: 0.6"></a-box>
+
+      <!-- núcleo energético: latido rojo pulsante -->
+      <a-sphere radius="0.4" position="0 1.8 0" 
+                material="opacity: 0.85; color: #8a0303; emissive: #ff1a1a; emissiveIntensity: 2.2"
+                animation="dir: alternate; dur: 700; loop: true; property: scale; to: 1.5 1.5 1.5">
+      </a-sphere>
+
+      <!-- anillo de grietas -->
+      <a-torus radius="1.2" radius-tubular="0.06" rotation="90 203.02898370398202 0" 
+               material="color: #ff3300; emissive: #ff3300; emissiveIntensity: 1.8; roughness: 0.9"
+               animation="dur: 6000; loop: true; property: rotation; to: 90 -160 0">
+      </a-torus>
+
+      <!-- niebla volumétrica roja -->
+      <a-entity id="fog_layer" geometry="primitive: plane; width: 4; height: 4"
+                material="opacity: 0.15; transparent: true; color: #4d0000; side: double"
+                position="0 1.5 0.3"
+                animation="dir: alternate; dur: 3000; loop: true; property: material.opacity; to: 0.3">
+      </a-entity>
+
+      <!-- zarcillos/esporas -->
+      <a-entity id="upside_down_particles">
+        <a-plane position="1.92 -1.81 0" width="0.15" height="0.4" 
+                 material="opacity: 0.75; transparent: true; color: #5c1010; roughness: 1"
+                 rotation="0 0 25"
+                 animation="dur: 5000; loop: true; property: position; to: 2 -2.4 0">
+        </a-plane>
+        <a-plane position="-0.4 -1.2 0.15" width="0.1" height="0.3" 
+                  material="opacity: 0.6; transparent: true; color: #3d0a0a; roughness: 1"
+                  rotation="0 0 -15"
+                  animation="dur: 6500; loop: true; property: position; to: -1 -3.5 0">
+        </a-plane>
+        <a-sphere position="0.91 -2.74 -0.02" radius="0.05"
+                  material="opacity: 0.65; transparent: true; color: #ff5533; emissive: #ff3300; emissiveIntensity: 1.5"
+                  animation="dur: 4000; loop: true; property: position; to: 1 -3.6 0.1">
+        </a-sphere>
+        <a-sphere position="-0.6 -2.1 0.1" radius="0.04"
+                  material="opacity: 0.6; transparent: true; color: #ff5533; emissive: #ff3300; emissiveIntensity: 1.3"
+                  animation="dur: 4700; loop: true; property: position; to: -0.7 -3.3 0.05">
+        </a-sphere>
+      </a-entity>
+
+      <!-- luz ambiental rojiza puntual -->
+      <a-light type="point" color="#ff2200" intensity="0.8" distance="4" 
+               position="0 1.8 0.5"></a-light>
+
+    </a-entity>
+
+    <a-entity light="type: ambient; color: #ff2200; intensity: 0.3"></a-entity>
+    <a-entity light="type: directional; color: #ff2200; intensity: 1" 
+              position="2 4 1"></a-entity>
+	    <a-entity light="color: #ff2200; intensity: 1" position="1.51267 1.74957 5.16604" data_liveedit_tagid="000000001281F520"></a-entity>
+	   <a-entity light="color: #ff2200; intensity: 1" position="4.96815 2.1794 -4.81062" data_liveedit_tagid="000000001281F2C0"></a-entity>
+	  
+	  
+ <a-entity light="color: #FFA900; intensity: 4.35; type: point" position="-2.80163 2.20419 -6.93355" data_liveedit_tagid="000000001276C550"></a-entity>
+	  
+	  <a-entity light="color: #FFA900; intensity: 4.35; type: point" position="-2.80163 2.20419 -1.86074" data_liveedit_tagid="000000001276C550"></a-entity>
+	  
+	  
+    <a-sky src="noche_cielo.jpg" color="#ffffff"></a-sky>
+
+  </a-entity>
+
 </a-scene>
 
 </body>
 </html>
+
