@@ -67,6 +67,26 @@ function goWorld(id) {
 }
 
 /* =========================
+   🔊 SOUND-TOGGLE
+   Activa/desactiva un sonido en bucle con el GATILLO (clic)
+========================= */
+AFRAME.registerComponent('sound-toggle', {
+  init: function () {
+    this.playing = false;
+    this.el.addEventListener('click', () => {
+      const soundComp = this.el.components.sound;
+      if (!soundComp) return;
+      if (this.playing) {
+        soundComp.stopSound();
+      } else {
+        soundComp.playSound();
+      }
+      this.playing = !this.playing;
+    });
+  }
+});
+
+/* =========================
    🔊 RAYCASTER-SOUND
    Reproduce el sonido del modelo al hacer clic con el raycaster
 ========================= */
@@ -302,7 +322,7 @@ function playWorldMusic(id) {
     <a-entity id="portal_world4" 
               class="clickable" 
               geometry="primitive: torus" 
-              material="color: #00ff88; emissive: #00ff88; emissiveIntensity: 2" 
+              material="color: #ff2200; emissive: #ff2200; emissiveIntensity: 2" 
               position="-54.10852 1.5029 -3.96282" 
               scale="1.0791629953283008 1.0791629953283008 1.0791629953283008" 
               rotation="0 53508625171.5 0" 
@@ -323,16 +343,16 @@ function playWorldMusic(id) {
     <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
                   position="-5 0 2"
                   class="clickable"
-                  sound="src: rotativo.mp3; autoplay: false; loop: false; volume: 5" 
-                  raycaster-sound
+                  sound="src: rotativo.mp3; autoplay: false; loop: true; volume: 10" 
+                  sound-toggle
                   rotation="0 -90 0"></a-gltf-model>
 
     <a-gltf-model src="retro-futuristic_gas_station_opt.glb"></a-gltf-model>
 
     <a-gltf-model src="truck_opt.glb"
                   class="clickable"
-                  sound="src: camion.mp3; autoplay: false; loop: false; volume: 5" 
-                  raycaster-sound
+                  sound="src: camion.mp3; autoplay: false; loop: true; volume: 10" 
+                  sound-toggle
                   position="-29 2.3 20"
                   rotation="0 -20 0"></a-gltf-model>
 
@@ -574,7 +594,7 @@ function playWorldMusic(id) {
     <!-- 🔮 PORTAL DE VUELTA (TORII) -->
     <a-entity id="portal_torii_aaa" class="clickable" 
               position="13.85591 0.20124 12.50308" 
-              rotation="0 90 0" scale="1.80 1.80 1.803" 
+              rotation="0 90 0" scale="2.4 2.4 2.404" 
               portal-aaa="target: #world_1" 
               portal-energy="">
 
