@@ -83,6 +83,24 @@ AFRAME.registerComponent('raycaster-sound', {
 });
 
 /* =========================
+   👆 CLICK-TOGGLE
+   Muestra/oculta un elemento al hacer CLIC (no con hover)
+========================= */
+AFRAME.registerComponent('click-toggle', {
+  schema: {
+    target: { type: 'selector' }
+  },
+  init: function () {
+    this.el.addEventListener('click', () => {
+      const target = this.data.target;
+      if (!target) return;
+      const isVisible = target.getAttribute('visible');
+      target.setAttribute('visible', !isVisible);
+    });
+  }
+});
+
+/* =========================
    🔮 PORTAL AAA
 ========================= */
 AFRAME.registerComponent('portal-aaa', {
@@ -230,10 +248,12 @@ function playWorldMusic(id) {
     <a-entity camera look-controls position="0 1.6 0"></a-entity>
 
     <a-entity laser-controls="hand: right"
-              raycaster="objects: .clickable"></a-entity>
+              raycaster="objects: .clickable"
+              cursor="downEvents: triggerdown; upEvents: triggerup"></a-entity>
 
     <a-entity laser-controls="hand: left"
-              raycaster="objects: .clickable"></a-entity>
+              raycaster="objects: .clickable"
+              cursor="downEvents: triggerdown; upEvents: triggerup"></a-entity>
 
   </a-entity>
 
@@ -282,7 +302,7 @@ function playWorldMusic(id) {
     <a-entity id="portal_world4" 
               class="clickable" 
               geometry="primitive: torus" 
-              material="color: #ff2200; emissive: #ff2200; emissiveIntensity: 2" 
+              material="color: #00ff88; emissive: #00ff88; emissiveIntensity: 2" 
               position="-54.10852 1.5029 -3.96282" 
               scale="1.0791629953283008 1.0791629953283008 1.0791629953283008" 
               rotation="0 53508625171.5 0" 
@@ -303,7 +323,7 @@ function playWorldMusic(id) {
     <a-gltf-model src="low_poly_mazda_mx-5_miata_na_update_opt.glb"
                   position="-5 0 2"
                   class="clickable"
-                  sound="src: rotativo.mp3; autoplay: false; loop: false" 
+                  sound="src: rotativo.mp3; autoplay: false; loop: false; volume: 5" 
                   raycaster-sound
                   rotation="0 -90 0"></a-gltf-model>
 
@@ -311,7 +331,7 @@ function playWorldMusic(id) {
 
     <a-gltf-model src="truck_opt.glb"
                   class="clickable"
-                  sound="src: camion.mp3; autoplay: false; loop: false" 
+                  sound="src: camion.mp3; autoplay: false; loop: false; volume: 5" 
                   raycaster-sound
                   position="-29 2.3 20"
                   rotation="0 -20 0"></a-gltf-model>
@@ -365,6 +385,8 @@ function playWorldMusic(id) {
         position="40 10 -5"
         scale="0.5 21 0.5"
         color="brown"
+        class="clickable"
+        click-toggle="target: #flag"
         event-set__enter="_event: raycaster-intersected; _target: #flag; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #flag; visible: false">
 
@@ -435,6 +457,8 @@ function playWorldMusic(id) {
     <a-gltf-model src="https://cdn.tinyglb.com/models/24124bd7335c44d29df2e26928cff98c.glb" 
         position="-20 0 -40" 
         scale="40 40 40"
+        class="clickable"
+        click-toggle="target: #petalos"
         event-set__enter="_event: raycaster-intersected; _target: #petalos; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #petalos; visible: false">
     </a-gltf-model>
@@ -521,6 +545,8 @@ function playWorldMusic(id) {
 
     <a-gltf-model src="https://cdn.tinyglb.com/models/54b114fb59464f7a9f1dcbe083fbbd0e.glb" 
         position="38 0 -37.5" scale="3 3 3" rotation="0 100 0"
+        class="clickable"
+        click-toggle="target: #mensajePozo"
         event-set__enter="_event: raycaster-intersected; _target: #mensajePozo; visible: true"
         event-set__leave="_event: raycaster-intersected-cleared; _target: #mensajePozo; visible: false">
     </a-gltf-model>
@@ -699,13 +725,13 @@ function playWorldMusic(id) {
     <a-entity light="type: ambient; color: #ff2200; intensity: 0.3"></a-entity>
     <a-entity light="type: directional; color: #ff2200; intensity: 1" 
               position="2 4 1"></a-entity>
-	    <a-entity light="color: #ff2200; intensity: 1" position="1.51267 1.74957 5.16604" data_liveedit_tagid="000000001281F520"></a-entity>
-	   <a-entity light="color: #ff2200; intensity: 1" position="4.96815 2.1794 -4.81062" data_liveedit_tagid="000000001281F2C0"></a-entity>
+	    <a-entity light="color: #ff2200; intensity: 1" position="1.51267 1.74957 5.16604"></a-entity>
+	   <a-entity light="color: #ff2200; intensity: 1" position="4.96815 2.1794 -4.81062"></a-entity>
 	  
 	  
- <a-entity light="color: #FFA900; intensity: 4.35; type: point" position="-2.80163 2.20419 -6.93355" data_liveedit_tagid="000000001276C550"></a-entity>
+ <a-entity light="color: #FFA900; intensity: 4.35; type: point" position="-2.80163 2.20419 -6.93355"></a-entity>
 	  
-	  <a-entity light="color: #FFA900; intensity: 4.35; type: point" position="-2.80163 2.20419 -1.86074" data_liveedit_tagid="000000001276C550"></a-entity>
+	  <a-entity light="color: #FFA900; intensity: 4.35; type: point" position="-2.80163 2.20419 -1.86074"></a-entity>
 	  
 	  
     <a-sky src="noche_cielo.jpg" color="#ffffff"></a-sky>
@@ -716,4 +742,3 @@ function playWorldMusic(id) {
 
 </body>
 </html>
-
