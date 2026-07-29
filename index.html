@@ -213,7 +213,7 @@ AFRAME.registerComponent('canvas-label', {
     height: { type: 'number', default: 0.6 },
     bgColor: { type: 'color', default: '#333333' },
     textColor: { type: 'color', default: '#ffffff' },
-    fontSize: { type: 'number', default: 60 }
+    fontSize: { type: 'number', default: 90 }
   },
   init: function () {
     const canvas = document.createElement('canvas');
@@ -225,27 +225,41 @@ AFRAME.registerComponent('canvas-label', {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = this.data.textColor;
-    ctx.font = `bold ${this.data.fontSize * 2}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // Salto de línea simple si el texto no cabe en una sola línea
-    const words = this.data.text.split(' ');
     const maxWidth = canvas.width * 0.9;
-    const lines = [];
-    let line = '';
-    words.forEach((word) => {
-      const test = line ? line + ' ' + word : word;
-      if (ctx.measureText(test).width > maxWidth && line) {
-        lines.push(line);
-        line = word;
-      } else {
-        line = test;
-      }
-    });
-    if (line) lines.push(line);
+    const maxHeight = canvas.height * 0.85;
 
-    const lineHeight = this.data.fontSize * 2.2;
+    // Reduce el tamaño de letra hasta que el bloque de texto (ya envuelto
+    // en varias líneas si hace falta) quepa dentro del lienzo. Antes el
+    // tamaño era fijo y demasiado grande: las líneas de más se calculaban
+    // fuera del área visible del canvas, así que no se veían aunque el
+    // fondo sí se pintara entero.
+    let fontSize = this.data.fontSize;
+    let lines = [];
+    for (let attempt = 0; attempt < 25; attempt++) {
+      ctx.font = `bold ${fontSize}px sans-serif`;
+      const words = this.data.text.split(' ');
+      lines = [];
+      let line = '';
+      words.forEach((word) => {
+        const test = line ? line + ' ' + word : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
+        }
+      });
+      if (line) lines.push(line);
+
+      const blockHeight = lines.length * (fontSize * 1.25);
+      if (blockHeight <= maxHeight || fontSize <= 16) break;
+      fontSize -= 4;
+    }
+
+    const lineHeight = fontSize * 1.25;
     const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
     lines.forEach((l, i) => {
       ctx.fillText(l, canvas.width / 2, startY + i * lineHeight);
@@ -258,6 +272,8 @@ AFRAME.registerComponent('canvas-label', {
     const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
     const mesh = new THREE.Mesh(geometry, material);
     this.el.setObject3D('canvas-label-mesh', mesh);
+
+    console.log(`[canvas-label] "${this.data.text}" -> tamaño de letra final: ${fontSize}px, líneas: ${lines.length}`);
   }
 });
 
@@ -407,6 +423,26 @@ function playWorldMusic(id) {
   }
 }
 
+/* =========================
+   🔍 DEBUG — comprobar si raycaster-intersected llega a dispararse
+   en la máquina y las señales al apuntar (sin hacer clic).
+========================= */
+document.addEventListener('DOMContentLoaded', () => {
+  ['#maquinaExpendedora', '#senal1', '#senal2', '#senal3'].forEach((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) {
+      console.warn('[debug-raycaster] no existe', sel);
+      return;
+    }
+    el.addEventListener('raycaster-intersected', (e) => {
+      console.log('[debug-raycaster] ENTER en', sel, 'desde', e.detail && e.detail.el && e.detail.el.id);
+    });
+    el.addEventListener('raycaster-intersected-cleared', (e) => {
+      console.log('[debug-raycaster] LEAVE en', sel);
+    });
+  });
+});
+
 </script>
 
 <!-- 🎬 PANTALLA DE INICIO -->
@@ -440,7 +476,9 @@ function playWorldMusic(id) {
   <a-entity id="playerRig"
             movement-controls="speed: 0.3; fly: false">
 
-    <a-entity camera look-controls position="0 1.6 0"></a-entity>
+    <a-entity camera look-controls position="0 1.6 0"
+              raycaster="objects: .clickable; far: 15"
+              cursor="rayOrigin: mouse"></a-entity>
 
     <a-entity laser-controls="hand: right"
               raycaster="objects: .clickable"
@@ -1002,7 +1040,7 @@ function playWorldMusic(id) {
     <a-gltf-model id="senal1" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
       position="28.61811 -0.00967 -60.20071" rotation="0 -50 0"
       sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
-      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 20"
+      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
       sound-toggle
       event-set__enter="_event: raycaster-intersected; _target: #boxText-1; visible: true"
       event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-1; visible: false"></a-gltf-model>
@@ -1010,7 +1048,7 @@ function playWorldMusic(id) {
     <a-gltf-model id="senal2" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
       position="26.90633 0.0453 -62.30645" rotation="0 -60 0"
       sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
-      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 20"
+      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
       sound-toggle
       event-set__enter="_event: raycaster-intersected; _target: #boxText-2; visible: true"
       event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-2; visible: false"></a-gltf-model>
@@ -1018,7 +1056,7 @@ function playWorldMusic(id) {
     <a-gltf-model id="senal3" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
       position="25.73594 0.0453 -64.55948" rotation="0 -60 0"
       sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
-      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 20"
+      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
       sound-toggle
       event-set__enter="_event: raycaster-intersected; _target: #boxText-3; visible: true"
       event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-3; visible: false"></a-gltf-model>
