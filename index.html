@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component@5.x.x/dist/aframe-event-set-component.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script> 
-  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
 </head>
 
 <body>
@@ -20,11 +19,12 @@ const spawnPoints = {
   "#world_1": { x: 0, y: 0, z: 0, rotY: 0 },
   "#world_2": { x: 0, y: 0, z: 0, rotY: 180 },
   "#world_3": { x: 0, y: 2, z: 5, rotY: 180 },
-  "#world_4": { x: 0, y: 0, z: 0, rotY: 180 }
+  "#world_4": { x: 0, y: 0, z: 0, rotY: 180 },
+  "#world_5": { x: 33.98853, y: 0, z: 0, rotY: 180 }
 };
 
 function stopAllWorldMusic() {
-  ['music_world1', 'music_world2', 'music_world3', 'music_world4'].forEach(id => {
+  ['music_world1', 'music_world2', 'music_world3', 'music_world4', 'music_world5'].forEach(id => {
     const soundEntity = document.querySelector('#' + id);
     if (soundEntity && soundEntity.components.sound) {
       soundEntity.components.sound.stopSound();
@@ -59,6 +59,7 @@ function goWorld(id) {
   if (id === '#world_2') musicId = '#music_world2';
   if (id === '#world_3') musicId = '#music_world3';
   if (id === '#world_4') musicId = '#music_world4';
+  if (id === '#world_5') musicId = '#music_world5';
 
   const music = document.querySelector(musicId);
   if (music && music.components.sound) {
@@ -194,6 +195,113 @@ AFRAME.registerComponent('portal-energy', {
 });
 
 /* =========================
+   🚨 BOOST-EMISSIVE
+   La carcasa del rotativo usa el material "gyro" (estático, no debe brillar
+   entero). Las piezas que REALMENTE giran y parpadean —las que mueve la
+   animación "Siren_flash" (nodos flash, flash_1..flash_7, Plan_2)— usan dos
+   materiales distintos: "Mat." y "Mat._0". Son esas, y solo esas, las que
+   coloreamos y hacemos parpadear con intensidad alta.
+   Los demás materiales que ya tenían algo de emissive propio (como
+   "phare_ar") se refuerzan un poco, sin parpadeo ni cambio de color.
+========================= */
+AFRAME.registerComponent('boost-emissive', {
+  schema: {
+    intensity: { type: 'number', default: 90 },
+    gyroColor: { type: 'color', default: '#ff0000' },
+    flashSpeed: { type: 'number', default: 6 }, // destellos por segundo aprox.
+    spotIntensity: { type: 'number', default: 40 },
+    rotSpeed: { type: 'number', default: 1.2 } // vueltas por segundo de la luz
+  },
+  init: function () {
+    this.gyroMaterials = [];
+    this.el.addEventListener('model-loaded', () => {
+      const mesh = this.el.getObject3D('mesh');
+      if (!mesh) {
+        console.warn('[boost-emissive] model-loaded disparado pero no hay objeto mesh en', this.el);
+        return;
+      }
+      let totalMeshes = 0;
+      let totalMaterials = 0;
+      let boosted = 0;
+      let gyroNode = null;
+      mesh.traverse((node) => {
+        if (node.isMesh && node.material) {
+          totalMeshes++;
+          const materials = Array.isArray(node.material) ? node.material : [node.material];
+          materials.forEach((mat) => {
+            totalMaterials++;
+            const name = (mat.name || '').toLowerCase();
+            // Solo la pieza giratoria del rotativo: materiales "Mat." / "Mat._0"
+            const isFlashPart = name === 'mat.' || name.startsWith('mat._');
+            const hasEmissive = mat.emissive && (mat.emissive.r > 0 || mat.emissive.g > 0 || mat.emissive.b > 0);
+            if (isFlashPart) {
+              boosted++;
+              mat.emissive = new THREE.Color(this.data.gyroColor);
+              mat.emissiveIntensity = this.data.intensity;
+              mat.toneMapped = false;
+              mat.needsUpdate = true;
+              this.gyroMaterials.push(mat);
+            } else if (hasEmissive) {
+              boosted++;
+              mat.emissiveIntensity = this.data.intensity * 0.3;
+              mat.toneMapped = false;
+              mat.needsUpdate = true;
+            }
+          });
+        }
+        // Localizamos el nodo del rotativo (no el interior) para colgar ahí
+        // una luz real que gire con él.
+        if (!gyroNode && node.name && node.name.toLowerCase().includes('gyro') &&
+            !node.name.toLowerCase().includes('interieur')) {
+          gyroNode = node;
+        }
+      });
+      console.log(`[boost-emissive] ${this.el.id || '(sin id)'}: ${totalMeshes} meshes, ${totalMaterials} materiales, ${boosted} reforzados, ${this.gyroMaterials.length} piezas del flash parpadeando, nodo gyro: ${gyroNode ? gyroNode.name : 'NO ENCONTRADO'}`);
+
+      // 🔦 Luz giratoria real (spot azul) colgada de la posición del rotativo
+      if (gyroNode) {
+        const worldPos = new THREE.Vector3();
+        gyroNode.getWorldPosition(worldPos);
+        const localPos = this.el.object3D.worldToLocal(worldPos.clone());
+
+        this.lightRig = new THREE.Group();
+        this.lightRig.position.copy(localPos);
+        this.el.object3D.add(this.lightRig);
+
+        const spotTarget = new THREE.Object3D();
+        spotTarget.position.set(3, -1, 0);
+        this.lightRig.add(spotTarget);
+
+        this.spotLight = new THREE.SpotLight(
+          new THREE.Color(this.data.gyroColor),
+          this.data.spotIntensity, 14, Math.PI / 6, 0.5, 1.5
+        );
+        this.spotLight.target = spotTarget;
+        this.lightRig.add(this.spotLight);
+      } else {
+        console.warn('[boost-emissive] No se encontró el nodo "gyro" para colgar la luz giratoria en', this.el.id);
+      }
+    });
+  },
+  tick: function (time, delta) {
+    if (this.gyroMaterials.length) {
+      // Onda cuadrada: alterna entre apagado y brillo máximo -> efecto destello,
+      // no una transición suave (así se parece más a un flash real).
+      const period = 1000 / this.data.flashSpeed;
+      const phase = (time % period) / period; // 0..1
+      const on = phase < 0.5;
+      const value = on ? this.data.intensity : this.data.intensity * 0.05;
+      this.gyroMaterials.forEach((mat) => {
+        mat.emissiveIntensity = value;
+      });
+    }
+    if (this.lightRig) {
+      this.lightRig.rotation.y += (delta / 1000) * this.data.rotSpeed * Math.PI * 2;
+    }
+  }
+});
+
+/* =========================
    🚀 INICIO — pantalla de bienvenida para desbloquear audio
 ========================= */
 document.addEventListener('DOMContentLoaded', () => {
@@ -259,7 +367,7 @@ function playWorldMusic(id) {
   </button>
 </div>
 
-<a-scene>
+<a-scene gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.7/">
 
   <!-- 🎮 PLAYER -->
   <a-entity id="playerRig"
@@ -333,6 +441,18 @@ function playWorldMusic(id) {
               scale="1.0791629953283008 1.0791629953283008 1.0791629953283008" 
               rotation="0 53508625171.5 0" 
               portal-aaa="target: #world_4" 
+              portal-energy="">
+    </a-entity>
+
+    <!-- 🔮 PORTAL → WORLD 5 (Carretera Perdida) -->
+    <a-entity id="portal_world5" 
+              class="clickable" 
+              geometry="primitive: torus" 
+              material="color: #f0e68c; emissive: #f0e68c; emissiveIntensity: 2" 
+              position="-65.5 1.5 16.50024" 
+              scale="1.0178576553961531 1.0178576553961531 1.0178576553961531" 
+              rotation="0 53559493166.61 0" 
+              portal-aaa="target: #world_5" 
               portal-energy="">
     </a-entity>
   </a-entity>
@@ -761,6 +881,109 @@ function playWorldMusic(id) {
 	  
 	  
     <a-sky src="noche_cielo.jpg" color="#ffffff"></a-sky>
+
+  </a-entity>
+
+  <!-- 🌍 WORLD 5 — CARRETERA PERDIDA (Unknown Road) -->
+  <a-entity id="world_5" data-world="true" visible="false" position="33.98853 0 0">
+
+    <a-sound id="music_world5"
+             src="Sit Down. Stand Up(MP3_160K).mp3"
+             sound="loop: true; volume: 10">
+    </a-sound>
+
+    <!-- suelo y cielo -->
+    <a-plane src="suelo.jpg" position="-5 0.1 -5" rotation="-90 0 0"
+              width="5" height="5" color="#7BC8A4"></a-plane>
+    <a-sky src="cielo.jpg" color="#ECECEC"></a-sky>
+
+    <!-- iluminación -->
+    <a-light type="ambient" color="#5B27F5"></a-light>
+    <a-light type="point" position="-4.20478 1.51209 -4.82557" intensity="5"></a-light>
+    <a-light type="point" position="-3.71273 1.60412 -4.92978" intensity="5" light="color: #ff0000"></a-light>
+    <a-light type="point" position="0.80876 5.58994 -9.03775"
+             intensity="5" light="color: #ffca82; distance: 18; intensity: 80; castShadow: true"></a-light>
+    <a-light type="point" position="-6.14969 5.83411 10.44772"
+             intensity="5" light="color: #ffca82; distance: 18; intensity: 80; castShadow: true"></a-light>
+    <a-light type="point" position="27 5.8 -62" intensity="5" light="color: #ffca82; distance: 18; intensity: 80"></a-light>
+
+    <!-- ══ MÁQUINA EXPENDEDORA ══
+         · Al mirarla con el raycaster (mouseenter): suena el zumbido ambiente y aparece el texto.
+         · Al pulsar el GATILLO (click, vía cursor de laser-controls): sound-toggle activa/desactiva la música. -->
+    <a-gltf-model id="maquinaExpendedora" class="clickable"
+      src="7286875bc78e4ef496b64831b2348f31.glb" scale="1 1 1" position="-5 0 -5"
+      sound="src: Sit Down. Stand Up(MP3_160K).mp3; autoplay: false; loop: true; volume: 25"
+      sound__buzz="on: mouseenter; src: freesound_community-room-with-buzz-incandescent-light-bulb-23892.mp3; volume: 50"
+      sound-toggle
+      event-set__enter="_event: mouseenter; _target: #boxText; visible: true"
+      event-set__leave="_event: mouseleave; _target: #boxText; visible: false">
+    </a-gltf-model>
+    <a-text id="boxText" value="It's an abandoned vending machine." align="center" color="#FFF"
+            position="-4.44162 2.7696 -5.05318" geometry="primitive: plane; width: 3"
+            material="color: #333" rotation="0 90 0" visible="false"></a-text>
+
+    <!-- ══ VALLAS DE PELIGRO ══
+         Mismo esquema de interacción que la máquina expendedora:
+         mouseenter → aviso sonoro; click con el gatillo → sound-toggle activa/desactiva la alarma.
+         ⚠️ Sustituye "aviso_peligro.mp3" y "alarma_peligro.mp3" por tus archivos de audio reales. -->
+    <a-gltf-model id="senal1" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
+      position="28.61811 -0.00967 -60.20071" rotation="0 -50 0"
+      sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
+      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
+      sound-toggle
+      event-set__enter="_event: mouseenter; _target: #boxText-1; visible: true"
+      event-set__leave="_event: mouseleave; _target: #boxText-1; visible: false"></a-gltf-model>
+
+    <a-gltf-model id="senal2" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
+      position="26.90633 0.0453 -62.30645" rotation="0 -60 0"
+      sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
+      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
+      sound-toggle
+      event-set__enter="_event: mouseenter; _target: #boxText-2; visible: true"
+      event-set__leave="_event: mouseleave; _target: #boxText-2; visible: false"></a-gltf-model>
+
+    <a-gltf-model id="senal3" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
+      position="25.73594 0.0453 -64.55948" rotation="0 -60 0"
+      sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
+      sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
+      sound-toggle
+      event-set__enter="_event: mouseenter; _target: #boxText-3; visible: true"
+      event-set__leave="_event: mouseleave; _target: #boxText-3; visible: false"></a-gltf-model>
+
+    <a-text id="boxText-1" value="DANGER! STAY AWAY!" align="center" color="#FFF"
+            position="28.33448 1.90655 -59.94273" geometry="primitive: plane; width: 3"
+            material="color: #333" rotation="0 130 0" visible="false"></a-text>
+    <a-text id="boxText-2" value="DANGER! STAY AWAY!" align="center" color="#FFF"
+            position="26.74534 2.6601 -62.68323" geometry="primitive: plane; width: 3"
+            material="color: #333" rotation="0 130 0" visible="false"></a-text>
+    <a-text id="boxText-3" value="DANGER! STAY AWAY!" align="center" color="#FFF"
+            position="26.30163 1.93453 -65.36191" geometry="primitive: plane; width: 3"
+            material="color: #333" rotation="0 130 0" visible="false"></a-text>
+
+    <!-- props decorativos -->
+    <a-gltf-model src="9b66b3aea2cf42dfadb35fb44f5cf3e4.glb"></a-gltf-model>
+    <a-gltf-model src="b4df86f1e6374bed90997ec6b339887a.glb" scale="0.5 0.5 0.5"
+      position="-0.98379 0.10099 -7.48522" rotation="10 0 10"></a-gltf-model>
+
+    <!-- elementos animados -->
+    <a-entity gltf-model="f13f73463dfb40f8a429c2f4b60c563f.glb" animation-mixer="" boost-emissive="gyroColor: #0033ff"
+      position="-5.58432 1.03715 9.02051" rotation="80 0 0"></a-entity>
+    <a-entity gltf-model="f13f73463dfb40f8a429c2f4b60c563f.glb" animation-mixer="" boost-emissive="gyroColor: #0033ff"
+      position="-1.45037 1.03715 4.66796" rotation="0 80 80"></a-entity>
+    <a-entity gltf-model="f13f73463dfb40f8a429c2f4b60c563f.glb" animation-mixer="" boost-emissive="gyroColor: #0033ff"
+      position="-1.0783 1.69295 11.42761" rotation="180 59 0"></a-entity>
+
+    <!-- 🔮 PORTAL DE VUELTA → WORLD 1 -->
+    <a-entity id="portal_back_to_main_w5"
+              class="clickable"
+              geometry="primitive: torus"
+              material="color: #f0e68c; emissive: #f0e68c; emissiveIntensity: 2"
+              position="20.84891 1.6 -1.37972"
+              scale="1 1 1"
+              rotation="0 -86.21385315905319 0"
+              portal-aaa="target: #world_1"
+              portal-energy="">
+    </a-entity>
 
   </a-entity>
 
