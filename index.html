@@ -393,7 +393,7 @@ function playWorldMusic(id) {
 
     <a-sound id="music_world1"
              src="warm-nights.mp3"
-             sound="loop: true; volume: 10">
+             sound="loop: true; volume: 4">
     </a-sound>
 
     <a-gltf-model src="backrooms_vr.glb"
@@ -925,8 +925,8 @@ function playWorldMusic(id) {
       sound="src: Sit Down. Stand Up(MP3_160K).mp3; autoplay: false; loop: true; volume: 25"
       sound__buzz="on: mouseenter; src: freesound_community-room-with-buzz-incandescent-light-bulb-23892.mp3; volume: 50"
       sound-toggle
-      event-set__enter="_event: mouseenter; _target: #boxText; visible: true"
-      event-set__leave="_event: mouseleave; _target: #boxText; visible: false">
+      event-set__enter="_event: raycaster-intersected; _target: #boxText; visible: true"
+      event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText; visible: false">
     </a-gltf-model>
     <a-entity id="boxText" position="-4.44162 2.7696 -5.05318" rotation="0 90 0" visible="false"
               geometry="primitive: plane; width: 3; height: 0.6" material="color: #333">
@@ -943,24 +943,24 @@ function playWorldMusic(id) {
       sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
       sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
       sound-toggle
-      event-set__enter="_event: mouseenter; _target: #boxText-1; visible: true"
-      event-set__leave="_event: mouseleave; _target: #boxText-1; visible: false"></a-gltf-model>
+      event-set__enter="_event: raycaster-intersected; _target: #boxText-1; visible: true"
+      event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-1; visible: false"></a-gltf-model>
 
     <a-gltf-model id="senal2" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
       position="26.90633 0.0453 -62.30645" rotation="0 -60 0"
       sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
       sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
       sound-toggle
-      event-set__enter="_event: mouseenter; _target: #boxText-2; visible: true"
-      event-set__leave="_event: mouseleave; _target: #boxText-2; visible: false"></a-gltf-model>
+      event-set__enter="_event: raycaster-intersected; _target: #boxText-2; visible: true"
+      event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-2; visible: false"></a-gltf-model>
 
     <a-gltf-model id="senal3" class="clickable" src="4349861a89594fb8923aebe3479420ec.glb"
       position="25.73594 0.0453 -64.55948" rotation="0 -60 0"
       sound="src: alarma_peligro.mp3; autoplay: false; loop: true; volume: 25"
       sound__buzz="on: mouseenter; src: aviso_peligro.mp3; volume: 40"
       sound-toggle
-      event-set__enter="_event: mouseenter; _target: #boxText-3; visible: true"
-      event-set__leave="_event: mouseleave; _target: #boxText-3; visible: false"></a-gltf-model>
+      event-set__enter="_event: raycaster-intersected; _target: #boxText-3; visible: true"
+      event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-3; visible: false"></a-gltf-model>
 
     <a-entity id="boxText-1" position="28.33448 1.90655 -59.94273" rotation="0 130 0" visible="false"
               geometry="primitive: plane; width: 3; height: 0.6" material="color: #333">
