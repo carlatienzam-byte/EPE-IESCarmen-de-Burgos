@@ -198,6 +198,70 @@ AFRAME.registerComponent('portal-energy', {
 });
 
 /* =========================
+   🏷️ CANVAS-LABEL
+   El componente "text" de A-Frame carga su fuente desde cdn.aframe.io por
+   red — y esa petición se estaba perdiendo (probablemente interceptada por
+   la herramienta de vista previa local), dejando el fondo visible pero sin
+   ninguna letra. Este componente dibuja el texto directamente en un
+   <canvas> del propio navegador (fuente del sistema, sin red) y lo usa
+   como textura de un plano — cero dependencias externas.
+========================= */
+AFRAME.registerComponent('canvas-label', {
+  schema: {
+    text: { type: 'string', default: '' },
+    width: { type: 'number', default: 3 },
+    height: { type: 'number', default: 0.6 },
+    bgColor: { type: 'color', default: '#333333' },
+    textColor: { type: 'color', default: '#ffffff' },
+    fontSize: { type: 'number', default: 60 }
+  },
+  init: function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = Math.round(1024 * (this.data.height / this.data.width));
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = this.data.bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = this.data.textColor;
+    ctx.font = `bold ${this.data.fontSize * 2}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Salto de línea simple si el texto no cabe en una sola línea
+    const words = this.data.text.split(' ');
+    const maxWidth = canvas.width * 0.9;
+    const lines = [];
+    let line = '';
+    words.forEach((word) => {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+
+    const lineHeight = this.data.fontSize * 2.2;
+    const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((l, i) => {
+      ctx.fillText(l, canvas.width / 2, startY + i * lineHeight);
+    });
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+
+    const geometry = new THREE.PlaneGeometry(this.data.width, this.data.height);
+    const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+    const mesh = new THREE.Mesh(geometry, material);
+    this.el.setObject3D('canvas-label-mesh', mesh);
+  }
+});
+
+/* =========================
    🚨 BOOST-EMISSIVE
    La carcasa del rotativo usa el material "gyro" (estático, no debe brillar
    entero). Las piezas que REALMENTE giran y parpadean —las que mueve la
@@ -928,11 +992,8 @@ function playWorldMusic(id) {
       event-set__enter="_event: raycaster-intersected; _target: #boxText; visible: true"
       event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText; visible: false">
     </a-gltf-model>
-    <a-text id="boxText" position="-4.44162 2.7696 -5.05318" rotation="0 90 0" visible="false"
-              geometry="primitive: plane; width: 3; height: 0.6" material="color: #333"
-              value="It's an abandoned vending machine." align="center" color="#FFF"
-              width="2.8"></a-text>
-   
+    <a-entity id="boxText" position="-4.44162 2.7696 -5.05318" rotation="0 90 0" visible="false"
+              canvas-label="text: It's an abandoned vending machine.; width: 3; height: 0.6"></a-entity>
 
     <!-- ══ VALLAS DE PELIGRO ══
          Mismo esquema de interacción que la máquina expendedora:
@@ -962,21 +1023,12 @@ function playWorldMusic(id) {
       event-set__enter="_event: raycaster-intersected; _target: #boxText-3; visible: true"
       event-set__leave="_event: raycaster-intersected-cleared; _target: #boxText-3; visible: false"></a-gltf-model>
 
-    <a-text  id="boxText-1" position="28.33448 1.90655 -59.94273" rotation="0 130 0" visible="false"
-              geometry="primitive: plane; width: 3; height: 0.6" material="color: #333"
-     value="DANGER! STAY AWAY!" align="center" color="#FFF" width="2.8"></a-text>
-   
-
-	  
-	  
-    <a-text id="boxText-2" position="26.74534 2.6601 -62.68323" rotation="0 130 0" visible="false"
-              geometry="primitive: plane; width: 3; height: 0.6" material="color: #333"
-      value="DANGER! STAY AWAY!" align="center" color="#FFF" width="2.8"></a-text>
-  
-   <a-text id="boxText-3" position="26.30163 1.93453 -65.36191" rotation="0 130 0" visible="false"
-              geometry="primitive: plane; width: 3; height: 0.6" material="color: #333"
-       value="DANGER! STAY AWAY!" align="center" color="#FFF" width="2.8"></a-text>
-   
+    <a-entity id="boxText-1" position="28.33448 1.90655 -59.94273" rotation="0 130 0" visible="false"
+              canvas-label="text: DANGER! STAY AWAY!; width: 3; height: 0.6"></a-entity>
+    <a-entity id="boxText-2" position="26.74534 2.6601 -62.68323" rotation="0 130 0" visible="false"
+              canvas-label="text: DANGER! STAY AWAY!; width: 3; height: 0.6"></a-entity>
+    <a-entity id="boxText-3" position="26.30163 1.93453 -65.36191" rotation="0 130 0" visible="false"
+              canvas-label="text: DANGER! STAY AWAY!; width: 3; height: 0.6"></a-entity>
 
     <!-- props decorativos -->
     <a-gltf-model src="9b66b3aea2cf42dfadb35fb44f5cf3e4.glb"></a-gltf-model>
