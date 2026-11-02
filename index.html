@@ -36,6 +36,49 @@ function stopAllWorldMusic() {
 }
 
 /* =========================
+   🧱 AISLAMIENTO DE MUNDOS
+   Cada mundo es independiente: solo se puede interactuar con el mundo
+   en el que estás, y al salir de un mundo se apaga todo lo que sonaba.
+   · Mundos ocultos: sus objetos pierden la clase "clickable" (los rayos
+     del mando y del ratón ya no los ven), se paran todos sus sonidos y
+     los interruptores (sound-toggle) vuelven a "apagado".
+   · Mundo visible: recupera sus "clickable".
+========================= */
+function aislarMundos(idVisible) {
+  document.querySelectorAll('[data-world]').forEach(world => {
+    const activo = ('#' + world.id) === idVisible;
+    const elementos = [world, ...world.querySelectorAll('*')];
+    elementos.forEach(el => {
+      // Interacciones
+      if (activo) {
+        if (el.dataset && el.dataset.clicOff) { el.classList.add('clickable'); delete el.dataset.clicOff; }
+      } else if (el.classList && el.classList.contains('clickable')) {
+        el.classList.remove('clickable'); el.dataset.clicOff = '1';
+      }
+      if (activo || !el.components) return;
+      // Sonidos (sound, sound__buzz, …) y audios HTML
+      Object.keys(el.components).forEach(nombre => {
+        const c = el.components[nombre];
+        if (nombre === 'sound' || nombre.indexOf('sound__') === 0) { try { c.stopSound(); } catch (e) {} }
+      });
+      if (el.components['sound-toggle']) el.components['sound-toggle'].playing = false;
+      if (el.tagName === 'AUDIO' || el.tagName === 'VIDEO') { try { el.pause(); } catch (e) {} }
+    });
+  });
+  // Que los rayos (mandos y ratón) vuelvan a leer la lista de objetos
+  document.querySelectorAll('[raycaster]').forEach(r => {
+    const rc = r.components && r.components.raycaster;
+    if (rc && rc.refreshObjects) rc.refreshObjects();
+  });
+}
+
+/* ¿Está este elemento en el mundo visible? (sube por la jerarquía) */
+function enMundoVisible(el) {
+  for (let o = el.object3D; o; o = o.parent) if (o.visible === false) return false;
+  return true;
+}
+
+/* =========================
    🌌 CAMBIO DE MUNDO
 ========================= */
 function goWorld(id) {
@@ -49,6 +92,8 @@ function goWorld(id) {
   if (target) {
     target.setAttribute('visible', true);
   }
+
+  aislarMundos(id);
 
   const rig = document.querySelector('#playerRig');
   if (rig && spawnPoints[id]) {
@@ -144,6 +189,7 @@ AFRAME.registerComponent('portal-aaa', {
 
   tick: function () {
     if (!this.player) return;
+    if (!enMundoVisible(this.el)) return;   // portal de un mundo oculto: no hace nada
 
     const playerPos = new THREE.Vector3();
     const portalPos = new THREE.Vector3();
@@ -1099,6 +1145,18 @@ document.addEventListener('DOMContentLoaded', () => {
   </a-entity>
 
 </a-scene>
+
+<script>
+  /* Al arrancar, solo el mundo visible es interactivo */
+  (function () {
+    const escena = document.querySelector('a-scene');
+    const iniciar = () => {
+      const visible = [...document.querySelectorAll('[data-world]')].find(w => w.getAttribute('visible') !== false);
+      aislarMundos(visible ? '#' + visible.id : '#world_1');
+    };
+    if (escena.hasLoaded) iniciar(); else escena.addEventListener('loaded', iniciar);
+  })();
+</script>
 
 </body>
 </html>
