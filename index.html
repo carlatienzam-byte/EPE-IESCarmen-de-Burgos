@@ -26,6 +26,19 @@ const spawnPoints = {
   "#world_5": { x: 33.98853, y: 0, z: 0, rotY: 180 }
 };
 
+/* =========================
+   🔙 APARICIÓN AL VOLVER AL HUB (World 1)
+   Depende del mundo del que vienes. Medido sobre el plano de
+   backrooms_vr.glb (escala 1.25). rotY: 0 = mirando a -Z, 180 = a +Z.
+========================= */
+const spawnRegreso = {
+  "#world_2": { x: -54.1, y: 0, z: 0.8,  rotY: 0 },    // gasolinera → junto a las dependencias del rosco rojo (Stranger Things)
+  "#world_3": { x: -54.9, y: 0, z: 10.8, rotY: 180 },  // japonés → hueco de la sala de la entrada a Carretera Perdida
+  "#world_4": { x: -23.5, y: 0, z: -2.5, rotY: 180 },  // Stranger Things → transepto del pasillo inicial, lado opuesto al Capitán Clark
+  "#world_5": { x: -80.5, y: 0, z: 8.5,  rotY: -151 }  // Carretera Perdida → sala del rosco que lleva a la gasolinera
+};
+let mundoActual = '#world_1';
+
 function stopAllWorldMusic() {
   ['music_world1', 'music_world2', 'music_world3', 'music_world4', 'music_world5'].forEach(id => {
     const soundEntity = document.querySelector('#' + id);
@@ -82,6 +95,8 @@ function enMundoVisible(el) {
    🌌 CAMBIO DE MUNDO
 ========================= */
 function goWorld(id) {
+  const origen = mundoActual;   // mundo del que salimos
+  mundoActual = id;
   stopAllWorldMusic();
 
   document.querySelectorAll('[data-world]').forEach(world => {
@@ -96,8 +111,8 @@ function goWorld(id) {
   aislarMundos(id);
 
   const rig = document.querySelector('#playerRig');
-  if (rig && spawnPoints[id]) {
-    const p = spawnPoints[id];
+  const p = (id === '#world_1' && spawnRegreso[origen]) || spawnPoints[id];
+  if (rig && p) {
     rig.object3D.position.set(p.x, p.y, p.z);
     rig.setAttribute('rotation', `0 ${p.rotY} 0`);
   }

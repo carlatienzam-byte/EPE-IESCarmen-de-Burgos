@@ -317,6 +317,14 @@
       camEl.object3D.getWorldPosition(this.cam);
       if (!this.prev) { this.prev = this.cam.clone(); return; }
 
+      // ── SALTO (portal / cambio de mundo): no se comprueba nada, ni en
+      //    horizontal ni en vertical. Antes la comprobación del SUELO se hacía
+      //    primero y, al volver desde un mundo con el punto de aparición más
+      //    alto (World 3, y = 2), el techo del World 1 se tomaba por suelo y la
+      //    cámara se quedaba encima del techo.
+      var sx = this.cam.x - this.prev.x, sz = this.cam.z - this.prev.z;
+      if (Math.sqrt(sx * sx + sz * sz) > this.data.salto || Math.abs(this.cam.y - this.prev.y) > 1) { this.revisar = true; this.prev.copy(this.cam); return; }
+
       // ── SUELO: si se ha bajado, comprobar que no se atraviesa ninguna superficie
       var dy = this.cam.y - this.prev.y;
       if (dy < -1e-5 && dy > -this.data.salto && this.mallas.length) {
